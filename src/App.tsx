@@ -1,11 +1,12 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Home from "./components/Home";
-import Signup from "./components/Signup";
-import Login from "./components/Login";
+import Home from "./pages/Home";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
 
-import Profile from "./components/Profile";
+import Profile from "./pages/Profile";
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import Chat from "./pages/Chat";
 
 function App() {
     return (
@@ -20,6 +21,7 @@ function App() {
                             path="/user/profile/:userId"
                             element={<Profile />}
                         ></Route>
+                        <Route path="/chat" element={<Chat />}></Route>
                     </Routes>
                 </div>
             </Router>

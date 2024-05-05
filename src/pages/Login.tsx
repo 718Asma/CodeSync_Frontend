@@ -15,7 +15,6 @@ const Login = () => {
                 googleId: response.clientId,
                 fullName: (decodedCredential as any).name,
             };
-            console.log("Google user: ", googleUser);
             const res = await axios.post("/auth/google", googleUser);
             const { refresh_token, access_token } = res.data;
             localStorage.setItem("access_token", access_token);
@@ -50,9 +49,10 @@ const Login = () => {
         try {
             const response = await axios.post("/auth/login", user);
 
-            const { refresh_token, access_token } = response.data;
+            const { refresh_token, access_token, user_id } = response.data;
             localStorage.setItem("access_token", access_token);
             localStorage.setItem("refresh_token", refresh_token);
+            localStorage.setItem("user_id", user_id);
 
             navigate("/");
         } catch (error) {

@@ -2,3 +2,7 @@ input[type="text"],
 input[type="password"] {
     background-color: #ffffff; /* Set background color to white */
 }
+
+input {
+    background-color: #ffffff !important;
+}

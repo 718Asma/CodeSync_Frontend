@@ -12,7 +12,6 @@ const Profile = () => {
                     "/user/profile/" + getUserIdFromUrl
                 );
                 setData(response.data);
-                console.log("Profile data: ", response.data);
             } catch (error) {
                 console.error("Error fetching profile data:", error);
             }
