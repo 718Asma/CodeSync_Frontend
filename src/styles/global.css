@@ -3,6 +3,113 @@ input[type="password"] {
     background-color: #ffffff; /* Set background color to white */
 }
 
-input {
-    background-color: #ffffff !important;
+input.search
+{
+    background-color: #e3e3e3 !important;
+    width: 350px;
+}
+
+.button
+{
+    padding : 10px;
+    padding-left: 15px;
+    color: #cecece;
+    border-radius: 5px;
+    width: 100%;
+    font-weight: bold;
+}
+
+.button:hover
+{
+    background-color: #A864FF;
+    color: #FFFFFF;
+}
+
+.side
+{
+    box-shadow: -5px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo
+{
+    width: 90%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 50px;
+    color: #7808ED;
+    font-family: Monotype Corsiva;
+    margin-top: 15%;
+}
+
+aside div img
+{
+    width: 35%;
+    height: 35%;
+    border-radius: 50%;
+    float: left;
+}
+
+.info
+{
+    font-size: small;
+}
+
+.follow
+{
+    background-color: #7808ED;
+    color: #FFFFFF;
+    width: 95px;
+    padding: 8px;
+    margin: 5px;
+    border-radius: 25px;
+    font-size: x-small;
+    text-align: center;
+}
+
+span
+{
+    font-weight: bold;
+}
+
+ol li
+{
+    list-style-type: decimal;
+    color: #818181;
+    margin-left: 25px;
+}
+
+.search
+{
+    padding: 10px;
+    border-radius: 25px;
+    border: none;
+}
+
+.discussion
+{
+    width: 285px;
+    height: 175px;
+    margin: 5px;
+    border: 1px solid black;
+    border-radius: 25px;
+}
+
+.titleBoxStyle
+{
+    background-color: rgba(255, 255, 255);
+    padding: 10px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    border-bottom: 1px solid black;
+    border-radius: 25px;
+}
+
+.post
+{
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid black;
+    border-radius: 15%;
 }
