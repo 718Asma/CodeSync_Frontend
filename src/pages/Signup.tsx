@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "../utils/axios";
 import redirector from "../utils/redirector";
 import { useNavigate } from "react-router-dom";
+import { log } from "console";
 
 const Signup = () => {
     const navigate = useNavigate();
@@ -43,6 +44,7 @@ const Signup = () => {
                 confirm_password: confirmPassword,
             };
             const res = await axios.post("/auth/signup", signUpForm);
+            console.log(res.data);
             // implement the sign up --> logs in the user and redirects to the home page
             const { refresh_token, access_token } = res.data;
             localStorage.setItem("access_token", access_token);
