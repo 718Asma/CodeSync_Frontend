@@ -1,23 +1,14 @@
-import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {  faBookmark, faCog, faComments, faEnvelope, faHouse, faSignIn, faUsers } from "@fortawesome/free-solid-svg-icons";
+import {  faBookmark, faCog, faComments, faEnvelope, faHouse, faUser, faUsers } from "@fortawesome/free-solid-svg-icons";
 
-const Navbar = () => {
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        localStorage.removeItem("user_id");
-        navigate("/auth/login");
-    };
+const Navbar = ( userId:any ) => {
 
     return (
-        <nav className="p-7 w-1/4" style={{ boxShadow: '5px 0px 10px rgba(0, 0, 0, 0.1)' }}>
+        <nav className="p-7 w-1/6 nav">
             <div className="flex flex-col items-start">
                 <div className="flex items-center mb-2">
-                    <img src="../assets/iris.jpg" alt="Iris" className="w-20 h-20 mr-2" />
-                    <p className="logo">Iris</p>
+                    <img src="../assets/iris.png" alt="Iris" className=" mr-2" />
+                    {/* <p className="logo">Iris</p> */}
                 </div>
                 <br/>
                 <a
@@ -27,6 +18,13 @@ const Navbar = () => {
                     >
                     <FontAwesomeIcon icon={faHouse} />&nbsp;
                     Home
+                </a>
+                <a
+                    href={`/user/profile/${userId}`}
+                    className="button mb-1 home-button"
+                    >
+                    <FontAwesomeIcon icon={faUser} />&nbsp;
+                    Profile
                 </a>
                 <a
                     href="/"
@@ -64,15 +62,6 @@ const Navbar = () => {
                     Setting
                 </a>
             </div>
-            <button
-                onClick={handleLogout}
-                className="text-white px-4 py-2 rounded"
-                style={{ backgroundColor : '#ED080B', marginTop: '80%'}}
-            >
-                <FontAwesomeIcon icon={faSignIn} />&nbsp;
-                <i className="fa fa-sign-in login-button-icon"></i> &nbsp;
-                Log Out
-            </button>
         </nav>
     );
 };

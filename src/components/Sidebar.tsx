@@ -1,28 +1,37 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPen } from "@fortawesome/free-solid-svg-icons";
+import React from 'react';
+import { faSignIn } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from 'react-router-dom';
 
 interface SidebarProps
 {
     user: string | null;
-    userId: string | null;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ user, userId }) => {
+const Sidebar: React.FC<SidebarProps> = ({ user }) => {
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("user_id");
+        navigate("/auth/login");
+    };
     return (
-        <aside className="p-7 w-1/4 side">
+        <aside className="p-7 w-1/6 side">
             <div>
                 <div className="flex items-center">
                     <img src="../assets/ooga.png" alt="Profile pic" className="mr-2" style={{ height: '50px', width: '50px' }} />
                     <div>
                         <p style={{ fontWeight: 'bold', marginBottom: '0' }}>{user}</p>
-                        <a
+                        <button
                             className="info"
-                            href={`/user/profile/${userId}`}
-                            style={{ color: '#7808ED' }}
+                            onClick={handleLogout}
+                            style={{ color: '#ED080B' }}
                         >
-                            Edit Profile&nbsp;
-                            <FontAwesomeIcon icon={faPen} />
-                        </a>
+                            <FontAwesomeIcon icon={faSignIn} />&nbsp;
+                            Log Out
+                        </button>
                     </div>
                 </div>
                 <p className="info">Hi, I am a graphic designer</p>
@@ -32,19 +41,19 @@ const Sidebar: React.FC<SidebarProps> = ({ user, userId }) => {
                     <p className="follow"><span>845</span> Following</p>
                 </div>
             </div>
-            <div>
-                <p style={{fontWeight : 'bold', fontSize:'20px'}}>Trending Topics</p>
-                <ol>
-                    <li>#Programming</li>
-                    <li>#Python</li>
-                    <li>#C++</li>
-                    <li>#PHP</li>
-                    <li>#meme</li>
-                    <li>#OOP</li>
-                    <li>#SpringBoot</li>
-                    <li>#Node_Js</li>
-                </ol>
-            </div>
+                <div>
+                    <p style={{fontWeight : 'bold', fontSize:'20px'}}>Trending Topics</p>
+                    <ol>
+                        <li><a>#Programming</a></li>
+                        <li>#Python</li>
+                        <li>#C++</li>
+                        <li>#PHP</li>
+                        <li>#meme</li>
+                        <li>#OOP</li>
+                        <li>#SpringBoot</li>
+                        <li>#Node_Js</li>
+                    </ol>
+                </div>
             <br/>
             <div>
                 <p style={{fontWeight : 'bold', fontSize:'20px'}}>Friends</p>
