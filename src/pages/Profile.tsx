@@ -10,10 +10,17 @@ import ProfileEdit from "../components/profileComponents/ProfileEdit";
 import ProfileFriends from "../components/profileComponents/ProfileFriends";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
     const [data, setData] = useState<any>(null);
     const { userId } = useParams();
+    const navigate = useNavigate();
+    
+
+    const handleGoBack = () => {
+        navigate(-1);
+    };
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -40,12 +47,12 @@ const Profile = () => {
                 <ProfileEdit data={data}/>
             </div>
             {/* <ProfileImageUpload /> */}
-            <Link to="/">
+            <button onClick={handleGoBack}>
                 <FontAwesomeIcon 
                     style={{position:"fixed",top:"6%",left:"5.7%"}} 
                     className="border border-gray-300 bg-white text-secondary-500 p-2 px-3 rounded-lg 20 hover:bg-secondary hover:text-white hover:border-transparent" icon={faArrowLeft}
                 />
-            </Link>
+            </button>
         </div>
     );
 };

@@ -1,5 +1,5 @@
-import axios from "axios";
-import { useState } from "react";
+import axios from "../../utils/axios";
+import { useState, useEffect } from "react";
 
 type ProfileHeaderProps = {
     data: any;
@@ -10,14 +10,18 @@ const ProfileHeader = ({ data }: ProfileHeaderProps) => {
     const userId = localStorage.getItem("user_id");
     
 
-    const handleFileChange = (e: any) => {
-        setFile(e.target.files[0]);
+    const handleFileChange = async (e: any) => {
+        const selectedFile = e.target.files[0];
+        setFile(selectedFile);
+        if (selectedFile) {
+            await handleSubmit(selectedFile);
+        }
     };
 
-    const handleSubmit = async (e: any) => {
-        e.preventDefault();
+
+    const handleSubmit = async (selectedFile: File) => {
         const formData = new FormData();
-        formData.append("coverImage", file!);
+        formData.append("coverImage", selectedFile);
 
         try {
             console.log(formData.get("coverImage"));
@@ -33,7 +37,11 @@ const ProfileHeader = ({ data }: ProfileHeaderProps) => {
         } catch (error) {
             console.error("Error uploading file:", error);
         }
+
     };    
+
+    
+    
     return (
         <div>
             {/* <h1 className="text-3xl font-bold mb-4">Profile</h1> */}
@@ -46,7 +54,7 @@ const ProfileHeader = ({ data }: ProfileHeaderProps) => {
                      style={{width:"155px",position: "absolute", top: "225px", left: "81%" }}
                     className="bg-white hover:bg-secondary-500 text-primary-500 font-semibold hover:text-white py-2 px-4  rounded-lg">Edit Cover Photo</button> */}
                     {data.data._id==userId && ( <div>
-                        <form onSubmit={handleSubmit}>
+                        <form >
                         <label
                             style={{width:"155px",position: "absolute", top: "225px", left: "81%" }}
                             htmlFor="cover"
@@ -55,7 +63,7 @@ const ProfileHeader = ({ data }: ProfileHeaderProps) => {
                             Edit Cover Photo
                             <input type="file" id="cover" className="hidden" onChange={handleFileChange}  />
                         </label>
-                        <button style={{float:"right"}} type="submit">Upload</button>
+                        {/* <button style={{float:"right"}} type="submit">Upload</button> */}
                     </form>
                     <button 
                     style={{float:"right",width:"155px",position: "absolute", top: "330px", left: "81%"}}
@@ -101,9 +109,7 @@ const ProfileHeader = ({ data }: ProfileHeaderProps) => {
                 
                         </div>
                     )}
-                    {imagePath && (
-                <img src={`http://localhost:3000/${imagePath}`} alt="Profile" />
-            )}
+                    
                     </div>
                 <div style={{marginLeft:"25%",height:"100px"}} className="p-4 mt-2">
                     <p className="font-bold text-xl text-gray-700">{data.data.fullName}</p>
