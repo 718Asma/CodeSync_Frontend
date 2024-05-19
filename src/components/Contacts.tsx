@@ -1,15 +1,27 @@
 import { useEffect, useState } from "react";
 
+type CurrentUserInfo = {
+    _id: string;
+    fullName: string;
+    profileImage: string;
+};
+
+type Contact = {
+    _id: string;
+    fullName: string;
+    profileImage: string;
+};
+
 type ContactsProps = {
-    contacts: any;
-    currentUser: any;
+    contacts: Contact[];
+    currentUser: CurrentUserInfo;
     changeChat: any;
     loading: boolean;
 };
 
 export default function Contacts(props: ContactsProps) {
     const { contacts, currentUser, changeChat } = props;
-    const [currentUserName, setCurrentUserName] = useState();
+    const [currentUserName, setCurrentUserName] = useState<CurrentUserInfo>();
     const [currentSelected, setCurrentSelected] = useState();
 
     useEffect(() => {
@@ -18,8 +30,9 @@ export default function Contacts(props: ContactsProps) {
         }
     }, [currentUser]);
 
-    const changeCurrentChat = (index: any, contact: any) => {
+    const changeCurrentChat = (index: any, contact: Contact) => {
         setCurrentSelected(index);
+        console.log(contact);
         changeChat(contact);
     };
 
@@ -28,15 +41,18 @@ export default function Contacts(props: ContactsProps) {
             <div className="flex justify-between items-center bg-gray-200 p-4">
                 <div className="flex items-center gap-4">
                     <div className="h-10 w-10 rounded-full overflow-hidden">
-                        {currentUser && currentUser.avatarImage ? (
+                        {currentUser && currentUser.profileImage ? (
                             <img
-                                src={currentUser.avatarImage}
-                                alt=""
+                                src={currentUser.profileImage}
+                                alt="user profile image"
                                 className="w-full h-full object-cover"
                             />
                         ) : (
                             <div className="flex items-center justify-center w-full h-full bg-gray-400 text-white">
-                                A
+                                <img
+                                    src="http://localhost:3000/assets/images/avatar.png"
+                                    alt="user profile image"
+                                />
                             </div>
                         )}
                     </div>
@@ -49,7 +65,7 @@ export default function Contacts(props: ContactsProps) {
                 </button>
             </div>
             <div className="overflow-auto">
-                {contacts.map((contact: any, index: any) => (
+                {contacts.map((contact: Contact, index: number) => (
                     <div
                         key={contact._id}
                         className={`flex items-center p-4 cursor-pointer transition duration-300 ${
@@ -60,15 +76,18 @@ export default function Contacts(props: ContactsProps) {
                         onClick={() => changeCurrentChat(index, contact)}
                     >
                         <div className="h-10 w-10 rounded-full overflow-hidden">
-                            {contact.avatarImage ? (
+                            {contact.profileImage ? (
                                 <img
-                                    src={contact.avatarImage}
-                                    alt=""
+                                    src={contact.profileImage}
+                                    alt="contact profile image"
                                     className="w-full h-full object-cover"
                                 />
                             ) : (
                                 <div className="flex items-center justify-center w-full h-full bg-gray-400 text-white">
-                                    A
+                                    <img
+                                        src="http://localhost:3000/assets/images/avatar.png"
+                                        alt="contact profile image"
+                                    />
                                 </div>
                             )}
                         </div>
