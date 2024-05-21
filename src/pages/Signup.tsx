@@ -104,7 +104,7 @@ const Signup = () => {
                 className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-xs"
                 onSubmit={formik.handleSubmit}
             >
-                <h1 className="text-2xl font-bold mb-4">Signup</h1>
+                <h1 className="text-2xl font-bold mb-4">Sign Up</h1>
                 {(formik.errors as ExtendedFormikErrors).general && (
                     <div className="text-red-500 mb-4">
                         {(formik.errors as ExtendedFormikErrors).general}
@@ -226,7 +226,7 @@ const Signup = () => {
                         type="submit"
                         disabled={formik.isSubmitting}
                     >
-                        {formik.isSubmitting ? "Signing up..." : "Signup"}
+                        {formik.isSubmitting ? "Signing up..." : "Sign Up"}
                     </button>
                 </div>
             </form>
