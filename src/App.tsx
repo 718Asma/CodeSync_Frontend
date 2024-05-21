@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Chat from "./pages/Chat";
+import Discover from "./pages/Discover";
 
 function App() {
     return (
@@ -17,10 +18,8 @@ function App() {
                         <Route path="/auth/login" element={<Login />}></Route>
                         <Route path="/auth/signup" element={<Signup />}></Route>
                         <Route path="/" element={<Home />}></Route>
-                        <Route
-                            path="/user/profile/:userId"
-                            element={<Profile />}
-                        ></Route>
+                        <Route path='/discover' element={<Discover />}></Route>
+                        <Route path="/user/profile/:userId"element={<Profile />}></Route>
                         <Route path="/chat" element={<Chat />}></Route>
                     </Routes>
                 </div>

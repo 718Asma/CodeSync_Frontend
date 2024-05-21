@@ -1,22 +1,20 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
 import { faSignIn } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from 'react-router-dom';
 
-interface SidebarProps
-{
-    user: string | null;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ user }) => {
+const Sidebar = ( ) => {
     const navigate = useNavigate();
+    
+    const user = localStorage.getItem("username");
 
     const handleLogout = () => {
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
         localStorage.removeItem("user_id");
+        localStorage.removeItem("username");
         navigate("/auth/login");
     };
+
     return (
         <aside className="p-7 w-1/6 side">
             <div>

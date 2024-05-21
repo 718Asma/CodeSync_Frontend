@@ -164,7 +164,7 @@ const Login = () => {
             <div className="text-center mt-4">
                 <p>Didn't sign up yet?</p>
                 <a className="text-blue-500" href="/auth/signup">
-                    Signup
+                    Sign Up
                 </a>
             </div>
             <div className="text-center mt-4">
