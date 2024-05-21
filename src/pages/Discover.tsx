@@ -24,16 +24,27 @@ const Discover = () => {
     useEffect(() => {
         const fetchDiscussions = async () => {
             try {
-                const response = await axios.get("/discussion/all");
-                console.log(response.data);
-                setDiscussions(response.data);
+                const response = await axios.get(`/discussion/all?page=${page}`);
+                if (Array.isArray(response.data)) {
+                    setDiscussions(prevDiscussions => [...prevDiscussions, ...response.data]);
+                    if (response.data.length === 0) {
+                        setLoading(true);
+                    } else {
+                        setLoading(false);
+                    }
+                } else {
+                    console.error("Unexpected response data:", response.data);
+                    setLoading(true);
+                }
             } catch (error) {
                 console.error("Error fetching discussions:", error);
+                setLoading(true);
             }
         };
 
         fetchDiscussions();
     }, [page]);
+
 
     const handleScroll = () => {
         if(window.innerHeight + document.documentElement.scrollTop + 1 >= document.documentElement.offsetHeight)
