@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import SearchBar from "./SearchBar";
 
 type CurrentUserInfo = {
     _id: string;
@@ -10,6 +11,7 @@ type Contact = {
     _id: string;
     fullName: string;
     profileImage: string;
+    online: boolean;
 };
 
 type ContactsProps = {
@@ -22,7 +24,7 @@ type ContactsProps = {
 export default function Contacts(props: ContactsProps) {
     const { contacts, currentUser, changeChat } = props;
     const [currentUserName, setCurrentUserName] = useState<CurrentUserInfo>();
-    const [currentSelected, setCurrentSelected] = useState();
+    const [currentSelected, setCurrentSelected] = useState<number>();
 
     useEffect(() => {
         if (currentUser) {
@@ -30,9 +32,8 @@ export default function Contacts(props: ContactsProps) {
         }
     }, [currentUser]);
 
-    const changeCurrentChat = (index: any, contact: Contact) => {
+    const changeCurrentChat = (index: number, contact: Contact) => {
         setCurrentSelected(index);
-        console.log(contact);
         changeChat(contact);
     };
 
@@ -75,7 +76,11 @@ export default function Contacts(props: ContactsProps) {
                         }`}
                         onClick={() => changeCurrentChat(index, contact)}
                     >
-                        <div className="h-10 w-10 rounded-full overflow-hidden">
+                        <div
+                            className={`h-10 w-10 rounded-full overflow-hidden border-2 ${
+                                contact.online ? "border-green-500" : ""
+                            }`}
+                        >
                             {contact.profileImage ? (
                                 <img
                                     src={contact.profileImage}

@@ -1,12 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "../utils/axios";
-// import styled from "styled-components";
 import ChatInput from "./ChatInput";
-// import { getMessageRoute, sendMessageRoute } from "../utils/APIroute";
 import { v4 as uuidv4 } from "uuid";
-// import { IoPersonCircle } from "react-icons/io5";
-
-// import "react-toastify/dist/ReactToastify.css";
 
 type Contact = {
     _id: string;
@@ -18,8 +13,8 @@ export default function ChatContainer(props: {
     currentChat: Contact;
     socket: any;
 }) {
-    const scrollRef = useRef<HTMLDivElement>();
-    const [messages, setMessages] = useState<any>([]);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [messages, setMessages] = useState<any[]>([]);
     const [incoming, setIncoming] = useState<any>(null);
     const OwnId = localStorage.getItem("user_id");
 
@@ -28,17 +23,13 @@ export default function ChatContainer(props: {
         setMessages(res.data);
     };
 
-    useEffect(
-        () => {
-            if (props.currentChat) {
-                getAllMessages();
-            }
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [props.currentChat]
-    );
+    useEffect(() => {
+        if (props.currentChat) {
+            getAllMessages();
+        }
+    }, [props.currentChat]);
 
-    const handleSend = async (msg: any) => {
+    const handleSend = async (msg: string) => {
         const user = localStorage.getItem("user_id");
         try {
             await axios.post("message/send", {
@@ -52,18 +43,11 @@ export default function ChatContainer(props: {
                 content: msg,
             });
 
-            props.socket.current.emit("send-notification", {
-                receiver: props.currentChat._id,
-                sender: user,
-                content: msg,
-            });
-
-            const updatedMessages: any = [...messages];
-            // TOFIX: user is just userId, add type checking and fix the name
+            const updatedMessages = [...messages];
             updatedMessages.push({
                 sender: user,
                 content: msg,
-                reciver: props.currentChat._id,
+                receiver: props.currentChat._id,
             });
             setMessages(updatedMessages);
         } catch (err) {
@@ -71,26 +55,20 @@ export default function ChatContainer(props: {
         }
     };
 
-    useEffect(
-        () => {
-            if (props.socket.current) {
-                //TODO: Fix the user type ( why call it twice )
-                const user = localStorage.getItem("user_id");
-                props.socket.current.on("msg-receive", (msg: any) => {
-                    setIncoming({
-                        receiver: user,
-                        content: msg,
-                        sender: props.currentChat._id,
-                    });
-                });
-            }
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        []
-    );
+    useEffect(() => {
+        if (props.socket.current) {
+            props.socket.current.off("msg-receive"); // Clear previous listeners to avoid duplicates
+            props.socket.current.on("msg-receive", (msg: any) => {
+                console.log("Received message:", msg); // Log the incoming message
+                setIncoming(msg);
+            });
+        }
+    }, [props.socket.current]);
 
     useEffect(() => {
-        incoming && setMessages((prev: any) => [...prev, incoming]);
+        if (incoming) {
+            setMessages((prev) => [...prev, incoming]);
+        }
     }, [incoming]);
 
     useEffect(() => {
@@ -132,7 +110,7 @@ export default function ChatContainer(props: {
                             </p>
                         </div>
                     ))}
-                    <div ref={scrollRef as any}></div>
+                    <div ref={scrollRef}></div>
                 </div>
                 <ChatInput sendMessage={handleSend} />
             </div>
