@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "../utils/axios";
 import ChatInput from "./ChatInput";
 import { v4 as uuidv4 } from "uuid";
+import { Avatar } from "@mantine/core";
 
 type Contact = {
     _id: string;
@@ -76,44 +77,44 @@ export default function ChatContainer(props: {
     }, [messages]);
 
     return (
-        <>
-            <div>
-                <div className="flex items-center p-4 border-b border-gray-200">
-                    <div className="w-12 h-12 rounded-full overflow-hidden">
-                        {props.currentChat.profileImage ? (
-                            <img
-                                src={props.currentChat.profileImage}
-                                alt="avatarImage"
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <div className="w-full h-full bg-gray-300"></div>
-                        )}
-                    </div>
-                    <div className="ml-4">
-                        <h3 className="text-lg font-medium text-gray-800">
-                            {props.currentChat.fullName}
-                        </h3>
-                    </div>
+        <div className="flex flex-col h-full">
+            <div className="flex items-center p-4 border-b border-gray-200">
+                <Avatar
+                    src={props.currentChat.profileImage}
+                    alt="avatarImage"
+                    radius="xl"
+                    size="lg"
+                />
+                <div className="ml-4">
+                    <h3 className="text-lg font-medium text-gray-800">
+                        {props.currentChat.fullName}
+                    </h3>
                 </div>
-                <div className="p-4 overflow-y-auto flex flex-col gap-4">
-                    {messages.map((message: any) => (
-                        <div key={uuidv4()} className="flex flex-col">
-                            <p
-                                className={`p-2 rounded-lg ${
-                                    message.sender === OwnId
-                                        ? "bg-green-100"
-                                        : "bg-gray-100"
-                                } self-end`}
-                            >
-                                {message.content}
-                            </p>
-                        </div>
-                    ))}
-                    <div ref={scrollRef}></div>
-                </div>
-                <ChatInput sendMessage={handleSend} />
             </div>
-        </>
+            <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-4">
+                {messages.map((message: any) => (
+                    <div
+                        key={uuidv4()}
+                        className={`flex flex-col ${
+                            message.sender === OwnId
+                                ? "items-end"
+                                : "items-start"
+                        }`}
+                    >
+                        <p
+                            className={`p-2 rounded-lg max-w-xs break-words ${
+                                message.sender === OwnId
+                                    ? "bg-green-100 text-right"
+                                    : "bg-gray-100 text-left"
+                            }`}
+                        >
+                            {message.content}
+                        </p>
+                    </div>
+                ))}
+                <div ref={scrollRef}></div>
+            </div>
+            <ChatInput sendMessage={handleSend} />
+        </div>
     );
 }

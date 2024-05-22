@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Avatar, ScrollArea } from "@mantine/core";
 import SearchBar from "./SearchBar";
 
 type CurrentUserInfo = {
@@ -38,34 +39,21 @@ export default function Contacts(props: ContactsProps) {
     };
 
     return (
-        <div>
+        <div className="w-full h-full flex flex-col">
             <div className="flex justify-between items-center bg-gray-200 p-4">
                 <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full overflow-hidden">
-                        {currentUser && currentUser.profileImage ? (
-                            <img
-                                src={currentUser.profileImage}
-                                alt="user profile image"
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <div className="flex items-center justify-center w-full h-full bg-gray-400 text-white">
-                                <img
-                                    src="http://localhost:3000/assets/images/avatar.png"
-                                    alt="user profile image"
-                                />
-                            </div>
-                        )}
-                    </div>
+                    <Avatar
+                        src={currentUser?.profileImage}
+                        alt={currentUser?.fullName}
+                        radius="xl"
+                        size="lg"
+                    />
                     <h2 className="text-gray-700 text-lg">
-                        {currentUser && currentUser.fullName}
+                        {currentUser?.fullName}
                     </h2>
                 </div>
-                <button className="text-gray-700 hover:text-gray-900">
-                    Logout
-                </button>
             </div>
-            <div className="overflow-auto">
+            <ScrollArea className="flex-1">
                 {contacts.map((contact: Contact, index: number) => (
                     <div
                         key={contact._id}
@@ -76,30 +64,19 @@ export default function Contacts(props: ContactsProps) {
                         }`}
                         onClick={() => changeCurrentChat(index, contact)}
                     >
-                        <div
-                            className={`h-10 w-10 rounded-full overflow-hidden border-2 ${
+                        <Avatar
+                            src={contact.profileImage}
+                            alt={contact.fullName}
+                            radius="xl"
+                            size="md"
+                            className={`border-2 ${
                                 contact.online ? "border-green-500" : ""
                             }`}
-                        >
-                            {contact.profileImage ? (
-                                <img
-                                    src={contact.profileImage}
-                                    alt="contact profile image"
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <div className="flex items-center justify-center w-full h-full bg-gray-400 text-white">
-                                    <img
-                                        src="http://localhost:3000/assets/images/avatar.png"
-                                        alt="contact profile image"
-                                    />
-                                </div>
-                            )}
-                        </div>
+                        />
                         <h3 className="ml-4">{contact.fullName}</h3>
                     </div>
                 ))}
-            </div>
+            </ScrollArea>
         </div>
     );
 }

@@ -1,6 +1,6 @@
-// components/SearchBar.tsx
 import React, { useState } from "react";
 import axios from "../utils/axios";
+import { TextInput, Avatar, List, ListItem, Group, Text } from "@mantine/core";
 
 type SearchBarProps = {
     onUserSelect: (user: any) => void;
@@ -9,7 +9,6 @@ type SearchBarProps = {
 const SearchBar: React.FC<SearchBarProps> = ({ onUserSelect }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [results, setResults] = useState([]);
-    console.log(results.length);
 
     const handleSearch = async (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
@@ -18,7 +17,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ onUserSelect }) => {
                 `/user/search-users?name=${event.target.value}`
             );
             let res = data.data;
-            // check wether the currentUser is in the search results and remove it
             const userId = localStorage.getItem("user_id");
             res = res.filter((user: any) => user._id !== userId);
             for (let i = 0; i < res.length; i++) {
@@ -45,27 +43,37 @@ const SearchBar: React.FC<SearchBarProps> = ({ onUserSelect }) => {
     };
 
     return (
-        <div className="search-bar">
-            <input
-                type="text"
+        <div className="relative w-full max-w-md mx-auto mb-4">
+            <TextInput
                 value={searchTerm}
                 onChange={handleSearch}
                 placeholder="Search users..."
-                className="input"
+                className="shadow-sm"
             />
             {results.length > 0 && (
-                <ul className="results-list">
-                    {results.map((user: any) => (
-                        <li key={user._id} onClick={() => handleSelect(user)}>
-                            <img
-                                src={user.profileImage}
-                                className="w-8 h-8"
-                                alt="user profile"
-                            />
-                            {user.fullName}
-                        </li>
-                    ))}
-                </ul>
+                <div className="absolute z-10 w-full bg-white shadow-lg rounded-md mt-1">
+                    <List>
+                        {results.map((user: any) => (
+                            <ListItem
+                                key={user._id}
+                                onClick={() => handleSelect(user)}
+                                className="cursor-pointer flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md"
+                            >
+                                <Group>
+                                    <Avatar
+                                        src={user.profileImage}
+                                        alt="user profile"
+                                        size="sm"
+                                    />
+                                    <Text fz="sm" fw={500}>
+                                        {user.fullName}
+                                    </Text>
+                                    {/* <span className="ml-2">{user.fullName}</span> */}
+                                </Group>
+                            </ListItem>
+                        ))}
+                    </List>
+                </div>
             )}
         </div>
     );

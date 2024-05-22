@@ -6,6 +6,7 @@ import NoSelectedContact from "../components/NoSelectedContact";
 import ChatContainer from "../components/ChatContainer";
 import { io, Socket } from "socket.io-client";
 import SearchBar from "../components/SearchBar";
+import { Button, Loader } from "@mantine/core";
 
 type CurrentUserInfo = {
     _id: string;
@@ -71,7 +72,6 @@ const Chat = () => {
             socket.current.emit("add-user", currentUser._id);
 
             socket.current.on("update-user-status", (data: any) => {
-                console.log("User status updated:", data);
                 setContacts((prevContacts) =>
                     prevContacts.map((contact) =>
                         contact._id === data.userId
@@ -84,7 +84,6 @@ const Chat = () => {
             socket.current.on(
                 "current-online-users",
                 (onlineUsers: string[]) => {
-                    console.log("Current online users:", onlineUsers);
                     setROnlineUsers(onlineUsers);
                     setContacts((prevContacts) =>
                         prevContacts.map((contact) =>
@@ -106,6 +105,12 @@ const Chat = () => {
     }, [currentUser]);
 
     function changeUserContacts(user: any): void {
+        // look if user already exists in contacts
+        if (contacts.find((contact) => contact._id === user._id)) {
+            // select the user
+            // setCurrentChat(user);
+            return;
+        }
         setContacts((prevContacts) => [...prevContacts, user]);
         setContacts((prevContacts) =>
             prevContacts.map((contact) =>
@@ -117,25 +122,30 @@ const Chat = () => {
     }
 
     return (
-        <div className="min-h-screen flex justify-center items-center bg-gray-100">
+        <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4">
             <SearchBar onUserSelect={changeUserContacts} />
-            <div className="container bg-white p-4 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="w-full max-w-6xl bg-white p-6 rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 gap-4">
                 {isLoading ? (
-                    <div className="h-full flex justify-center items-center">
-                        Loading...
+                    <div className="col-span-2 flex justify-center items-center">
+                        <Loader color="blue" />
                     </div>
                 ) : (
-                    <Contacts
-                        contacts={contacts}
-                        currentUser={currentUser!}
-                        changeChat={handleChatChange}
-                        loading={isLoading}
-                    />
-                )}
-                {currentChat ? (
-                    <ChatContainer currentChat={currentChat} socket={socket} />
-                ) : (
-                    <NoSelectedContact currentUser={currentUser} />
+                    <>
+                        <Contacts
+                            contacts={contacts}
+                            currentUser={currentUser!}
+                            changeChat={handleChatChange}
+                            loading={isLoading}
+                        />
+                        {currentChat ? (
+                            <ChatContainer
+                                currentChat={currentChat}
+                                socket={socket}
+                            />
+                        ) : (
+                            <NoSelectedContact currentUser={currentUser} />
+                        )}
+                    </>
                 )}
             </div>
         </div>
