@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Avatar, ScrollArea } from "@mantine/core";
-import SearchBar from "./SearchBar";
 
 type CurrentUserInfo = {
     _id: string;
