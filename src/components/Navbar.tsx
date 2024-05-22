@@ -14,51 +14,50 @@ const Navbar = () => {
                 <div className="flex items-center mb-2">
                     <img src="../assets/Untitled-2-02.png" alt="CodeSync" className="mr-2" />
                 </div>
-                <br/>
                 <a
                     href="/"
-                    className="button mb-1 my-4 home-button"
+                    className="button mb-1 my-2 home-button"
                 >
                     <FontAwesomeIcon icon={faHouse} />&nbsp;
                     Home
                 </a>
                 <a
                     href={`/user/profile/${userId}`}
-                    className="button mb-1 my-4"
+                    className="button mb-1 my-2"
                 >
                     <FontAwesomeIcon icon={faUser} />&nbsp;
                     Profile
                 </a>
                 <a
                     href="/"
-                    className="button mb-1 my-4"
+                    className="button mb-1 my-2"
                 >
                     <FontAwesomeIcon icon={faBookmark} />&nbsp;
                     Saved
                 </a>
                 <a
                     href="/discover"
-                    className="button mb-1 my-4"
+                    className="button mb-1 my-2"
                 >
                     <FontAwesomeIcon icon={faComments} />&nbsp;
                     Explore
                 </a>
                 <a
                     href="/chat"
-                    className="button mb-1 my-4"
+                    className="button mb-1 my-2"
                 >
                     <FontAwesomeIcon icon={faEnvelope} />&nbsp;
                     Message
                 </a>
                 <a
                     href="/"
-                    className="button mb-1 my-4"
+                    className="button mb-1 my-2"
                 >
                     <FontAwesomeIcon icon={faCog} />&nbsp;
                     Setting
                 </a>
             </div>
-            <div className="mt-auto pt-4" style={{fontSize:'12px'}}>
+            <div className="mt-auto" style={{fontSize:'12px'}}>
                 CodeSync <FontAwesomeIcon icon={faCopyrightRegular} /> Copyright 2024
             </div>
         </nav>
