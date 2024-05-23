@@ -130,8 +130,13 @@ ol li
     margin-left: auto;
     margin-right: auto;
     padding: 5px;
+<<<<<<< HEAD
+    width: 65%;
+    border-radius: 5%;
+=======
     width: 85%;
     border-radius: 25px;
+>>>>>>> 49ebd5bf54069dac826cf0e46b0c277b927b23ed
     display: flex;
     flex-direction: row;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
@@ -178,13 +183,43 @@ hr
 {
     width: 90%;
     height: 300px;
+<<<<<<< HEAD
+    margin-top: 100px;
+=======
     margin-top: 35px;
+>>>>>>> 49ebd5bf54069dac826cf0e46b0c277b927b23ed
     margin-left: auto;
     margin-right: auto;
     padding: 5px;
     border: 1.75px solid rgb(136, 136, 136);
+<<<<<<< HEAD
+    border-radius: 7.5%;
+    display: flex;
+    flex-direction: row;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+.icon-container {
+    display: flex; /* Pour aligner les éléments sur la même ligne */
+    align-items: center; /* Pour aligner les éléments verticalement */
+}
+
+.icon-container div {
+    display: flex; /* Pour que les boutons soient alignés horizontalement */
+    align-items: center; /* Pour aligner les boutons verticalement */
+}
+
+.icon-container button {
+    margin-right: 10px; /* Espacement entre les boutons */
+}
+
+.bookmark-button {
+    margin-left: auto; /* Met le bouton de bookmark à la fin de la ligne */
+}
+=======
     border-radius: 25px;
     display: flex;
     flex-direction: row;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 }
+>>>>>>> 49ebd5bf54069dac826cf0e46b0c277b927b23ed

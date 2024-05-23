@@ -47,7 +47,7 @@ const Home = () => {
     const [posts, setPosts] = useState<PostProps[]>([]);
     
 
-    useEffect(() => {
+   /* useEffect(() => {
         redirector(navigate);
         const fetchUserInfo = async () => {
             const userId = localStorage.getItem("user_id");
@@ -60,9 +60,14 @@ const Home = () => {
             localStorage.setItem("user_id", data.data._id);
             localStorage.setItem("username", data.data.fullName);
         };
+<<<<<<< HEAD
+        fetchProtectedData();
+    }, []);*/
+=======
         
         fetchUserInfo();
     }, []);
+>>>>>>> 49ebd5bf54069dac826cf0e46b0c277b927b23ed
 
     useEffect(() => {
         const fetchDiscussions = async () => {
@@ -140,6 +145,13 @@ const Home = () => {
                         </button>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'row', overflowX: 'auto', maxWidth: '100%' }}>
+<<<<<<< HEAD
+                        {discussions.map((discussion, index) => (
+                            <div key={index} style={{ flex: '0 0 auto', marginRight: '10px' }}>
+                                <Discussion id={""} {...discussion} />
+                            </div>
+                        ))}
+=======
                         {discussions.length > 0 ? (
                             discussions.map((discussion, index) => (
                                 <div key={index} style={{ flex: '0 0 auto', marginRight: '10px' }}>
@@ -151,6 +163,7 @@ const Home = () => {
                                         You have no discussions. Discover new ones <a href="/" style={{ textDecoration: 'underline', color: '#ED080B' }}>here</a>.
                             </p>
                         )}
+>>>>>>> 49ebd5bf54069dac826cf0e46b0c277b927b23ed
                     </div>
                 </section>
                 <br/><br/>

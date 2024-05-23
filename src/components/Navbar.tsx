@@ -12,7 +12,12 @@ const Navbar = () => {
         <nav className="p-7 w-1/6 nav flex flex-col justify-between h-full">
             <div className="flex flex-col items-start">
                 <div className="flex items-center mb-2">
+<<<<<<< HEAD
+                    <img src="../assets/logo.png" alt="logo" className=" mr-2" />
+                    {/* <p className="logo">Iris</p> */}
+=======
                     <img src="../assets/Untitled-2-02.png" alt="CodeSync" className="mr-2" />
+>>>>>>> 49ebd5bf54069dac826cf0e46b0c277b927b23ed
                 </div>
                 <a
                     href="/"
