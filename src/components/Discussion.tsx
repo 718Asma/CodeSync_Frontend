@@ -1,15 +1,17 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 interface DiscussionProps
 {
+    id: string;
     img: string;
     title: string;
     members: string;
 }
 
-const Discussion: React.FC<DiscussionProps> = ({ img, title, members }) => {
+const Discussion: React.FC<DiscussionProps> = ({ id, img, title, members }) => {
     return (
       <div className="discussion" style={{ backgroundImage: `url(${img})`, backgroundSize: 'cover', position : 'relative' }}>
         <div className="titleBoxStyle" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -20,7 +22,10 @@ const Discussion: React.FC<DiscussionProps> = ({ img, title, members }) => {
                     <p style={{ marginBottom: '0', fontSize : '10px' }}>{members}</p>
                 </div>
             </div>
-            <a><FontAwesomeIcon icon={faExternalLinkAlt} /></a>
+            <Link to={`/discussion/${id}`}>
+                <FontAwesomeIcon icon={faExternalLinkAlt} />
+            </Link>
+
         </div>
       </div>
     );

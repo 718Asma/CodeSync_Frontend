@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Chat from "./pages/Chat";
+import DiscussionPage from "./pages/Discussion";
 
 function App() {
     return (
@@ -22,6 +23,7 @@ function App() {
                             element={<Profile />}
                         ></Route>
                         <Route path="/chat" element={<Chat />}></Route>
+                        <Route path="/discussion" element={<DiscussionPage />}></Route>
                     </Routes>
                 </div>
             </Router>

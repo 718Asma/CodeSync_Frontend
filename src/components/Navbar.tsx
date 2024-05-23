@@ -7,7 +7,7 @@ const Navbar = ( userId:any ) => {
         <nav className="p-7 w-1/6 nav">
             <div className="flex flex-col items-start">
                 <div className="flex items-center mb-2">
-                    <img src="../assets/iris.png" alt="Iris" className=" mr-2" />
+                    <img src="../assets/logo.png" alt="logo" className=" mr-2" />
                     {/* <p className="logo">Iris</p> */}
                 </div>
                 <br/>

@@ -52,7 +52,7 @@ const Home = () => {
                         {img: '../assets/107730523_1684123215077508_2274373016493296102_n.png', description: 'Python now vs Python back then 😂😂'}
     ]);
 
-    useEffect(() => {
+   /* useEffect(() => {
         redirector(navigate);
         const fetchProtectedData = async () => {
             try {
@@ -64,7 +64,7 @@ const Home = () => {
             }
         };
         fetchProtectedData();
-    }, []);
+    }, []);*/
 
     const handleScroll = () => {
         if (
@@ -117,7 +117,7 @@ const Home = () => {
                     <div style={{ display: 'flex', flexDirection: 'row', overflowX: 'auto', maxWidth: '100%' }}>
                         {discussions.map((discussion, index) => (
                             <div key={index} style={{ flex: '0 0 auto', marginRight: '10px' }}>
-                                <Discussion {...discussion} />
+                                <Discussion id={""} {...discussion} />
                             </div>
                         ))}
                     </div>
