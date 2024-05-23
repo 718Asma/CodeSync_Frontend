@@ -11,7 +11,12 @@ import Discover from "./pages/Discover";
 import ChatGPT from "./pages/ChatGPT";
 
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 import { createTheme, MantineProvider } from "@mantine/core";
+import DiscussionForm from "./forms/DiscussionForm";
+
+import { Notifications } from "@mantine/notifications";
+import PostForm from "./forms/PostForm";
 
 // const theme = createTheme({
 //     /** Put your mantine theme override here */
@@ -20,6 +25,7 @@ import { createTheme, MantineProvider } from "@mantine/core";
 function App() {
     return (
         <MantineProvider>
+            <Notifications />
             <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>
                 <Router>
                     <div>
@@ -44,6 +50,11 @@ function App() {
                             <Route path="/chat" element={<Chat />}></Route>
                             <Route path="/chatgpt" element={<ChatGPT />} />{" "}
                             {/* Add this line */}
+                            <Route
+                                path="discussion/create"
+                                element={<DiscussionForm />}
+                            />{" "}
+                            <Route path="post/create" element={<PostForm />} />{" "}
                         </Routes>
                     </div>
                 </Router>
