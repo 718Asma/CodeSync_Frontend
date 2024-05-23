@@ -1,30 +1,60 @@
 import { useState, useEffect } from "react";
-// import Lottie from "lottie-react";
-// import conversation from "../assets/animation_lnhbqvxp.json";
-// import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
+import axios from "../utils/axios";
+import { Avatar } from "@mantine/core";
 
-function NoSelectedContact() {
-    const [user, setUser] = useState("");
-    const getUser = () => {
-        const existing = localStorage.getItem("user_id");
-        if (existing) {
-            setUser(existing);
+type CurrentUserInfo = {
+    _id: string;
+    fullName: string;
+    profileImage: string;
+};
+
+function NoSelectedContact({ currentUser }: { currentUser?: CurrentUserInfo }) {
+    const navigate = useNavigate();
+    const [user, setUser] = useState<CurrentUserInfo | null>(null);
+
+    const fetchUserDetails = async (userId: string) => {
+        try {
+            const { data } = await axios.get(`user/profile/${userId}`);
+            let { _id, fullName, profileImage } = data.data;
+            if (!profileImage) {
+                profileImage = "http://localhost:3000/assets/images/avatar.png";
+            } else {
+                profileImage = `http://localhost:3000/${profileImage}`;
+            }
+            setUser({ _id, fullName, profileImage });
+        } catch (error) {
+            console.error("Error fetching user details:", error);
         }
     };
 
-    useEffect(
-        () => {
-            getUser();
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        []
-    );
+    useEffect(() => {
+        const existingUserId = localStorage.getItem("user_id");
+
+        if (currentUser) {
+            setUser(currentUser);
+        } else if (existingUserId) {
+            fetchUserDetails(existingUserId);
+        } else {
+            navigate("/login");
+        }
+    }, [currentUser, navigate]);
 
     return (
-        <div className="flex flex-col items-center justify-center text-center">
-            {/* <Lottie animationData={conversation} loop={true} /> */}
+        <div className="flex flex-col items-center justify-center h-full text-center p-4">
+            <Avatar
+                src={
+                    user
+                        ? user.profileImage
+                        : "http://localhost:3000/assets/images/avatar.png"
+                }
+                alt="User avatar"
+                radius="xl"
+                size="lg"
+                className="mb-4"
+            />
             <h1 className="text-4xl font-bold text-gray-800 mb-4">
-                Welcome, {user}!
+                Welcome, {user ? user.fullName : "User"}!
             </h1>
             <h3 className="text-lg text-gray-600">
                 Please select a chat to start messaging.
@@ -32,19 +62,5 @@ function NoSelectedContact() {
         </div>
     );
 }
-
-// const Container = styled.div`
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//     color: #128c7e;
-//     flex-direction: column;
-//     img {
-//         height: 20rem;
-//     }
-//     span {
-//         color: #4e0eff;
-//     }
-// `;
 
 export default NoSelectedContact;

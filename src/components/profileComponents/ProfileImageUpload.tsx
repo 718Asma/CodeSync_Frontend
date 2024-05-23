@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "../../utils/axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faImage } from "@fortawesome/free-solid-svg-icons";
 
 function ProfileImageUpload() {
     const [file, setFile] = useState(null);
@@ -33,13 +35,19 @@ function ProfileImageUpload() {
     return (
         <div>
             <form onSubmit={handleSubmit}>
-                <input type="file" onChange={handleFileChange} />
+                <label
+                    htmlFor="photo"
+                    className="cursor-pointer bg-primary-400 hover:bg-primary-300 text-lg text-white font-semibold py-2 px-4  rounded-lg"
+                >
+                    <FontAwesomeIcon icon={faImage} />&nbsp;Change Photo
+                    <input type="file" id="photo" className="hidden" onChange={handleFileChange} />
+                </label>
                 <button type="submit">Upload</button>
             </form>
-            here is the image:
+            {/* here is the image:
             {imagePath && (
                 <img src={`http://localhost:3000/${imagePath}`} alt="Profile" />
-            )}
+            )} */}
         </div>
     );
 }

@@ -1,16 +1,30 @@
 import { useEffect, useState } from "react";
+import { Avatar, ScrollArea } from "@mantine/core";
+
+type CurrentUserInfo = {
+    _id: string;
+    fullName: string;
+    profileImage: string;
+};
+
+type Contact = {
+    _id: string;
+    fullName: string;
+    profileImage: string;
+    online: boolean;
+};
 
 type ContactsProps = {
-    contacts: any;
-    currentUser: any;
+    contacts: Contact[];
+    currentUser: CurrentUserInfo;
     changeChat: any;
     loading: boolean;
 };
 
 export default function Contacts(props: ContactsProps) {
     const { contacts, currentUser, changeChat } = props;
-    const [currentUserName, setCurrentUserName] = useState();
-    const [currentSelected, setCurrentSelected] = useState();
+    const [currentUserName, setCurrentUserName] = useState<CurrentUserInfo>();
+    const [currentSelected, setCurrentSelected] = useState<number>();
 
     useEffect(() => {
         if (currentUser) {
@@ -18,38 +32,28 @@ export default function Contacts(props: ContactsProps) {
         }
     }, [currentUser]);
 
-    const changeCurrentChat = (index: any, contact: any) => {
+    const changeCurrentChat = (index: number, contact: Contact) => {
         setCurrentSelected(index);
         changeChat(contact);
     };
 
     return (
-        <div>
+        <div className="w-full h-full flex flex-col">
             <div className="flex justify-between items-center bg-gray-200 p-4">
                 <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full overflow-hidden">
-                        {currentUser && currentUser.avatarImage ? (
-                            <img
-                                src={currentUser.avatarImage}
-                                alt=""
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <div className="flex items-center justify-center w-full h-full bg-gray-400 text-white">
-                                A
-                            </div>
-                        )}
-                    </div>
+                    <Avatar
+                        src={currentUser?.profileImage}
+                        alt={currentUser?.fullName}
+                        radius="xl"
+                        size="lg"
+                    />
                     <h2 className="text-gray-700 text-lg">
-                        {currentUser && currentUser.fullName}
+                        {currentUser?.fullName}
                     </h2>
                 </div>
-                <button className="text-gray-700 hover:text-gray-900">
-                    Logout
-                </button>
             </div>
-            <div className="overflow-auto">
-                {contacts.map((contact: any, index: any) => (
+            <ScrollArea className="flex-1">
+                {contacts.map((contact: Contact, index: number) => (
                     <div
                         key={contact._id}
                         className={`flex items-center p-4 cursor-pointer transition duration-300 ${
@@ -59,23 +63,19 @@ export default function Contacts(props: ContactsProps) {
                         }`}
                         onClick={() => changeCurrentChat(index, contact)}
                     >
-                        <div className="h-10 w-10 rounded-full overflow-hidden">
-                            {contact.avatarImage ? (
-                                <img
-                                    src={contact.avatarImage}
-                                    alt=""
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <div className="flex items-center justify-center w-full h-full bg-gray-400 text-white">
-                                    A
-                                </div>
-                            )}
-                        </div>
+                        <Avatar
+                            src={contact.profileImage}
+                            alt={contact.fullName}
+                            radius="xl"
+                            size="md"
+                            className={`border-2 ${
+                                contact.online ? "border-green-500" : ""
+                            }`}
+                        />
                         <h3 className="ml-4">{contact.fullName}</h3>
                     </div>
                 ))}
-            </div>
+            </ScrollArea>
         </div>
     );
 }
