@@ -44,7 +44,7 @@ const Profile = () => {
                 <ProfileData data={data} />
                 <ProfileFriends data={data} />
                 {/* <ProfilePost data={data}/> */}
-                {/* <ProfileEdit data={data}/> */}
+                <ProfileEdit data={data}/>
             </div>
             {/* <ProfileImageUpload /> */}
             <button onClick={handleGoBack}>
