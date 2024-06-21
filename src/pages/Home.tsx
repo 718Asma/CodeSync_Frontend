@@ -16,6 +16,7 @@ import { BellOutlined, LoadingOutlined } from '@ant-design/icons';
 
 interface DiscussionProps
 {
+    _id: string;
     creator: string;
     participants: [];
     title: string;
@@ -26,7 +27,7 @@ interface DiscussionProps
 
 interface PostProps
 {
-    id: string;
+    _id: string;
     owner: string;
     discussion: string;
     content: string;
@@ -43,11 +44,31 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
 
     const [user, setUser] = useState<any>(null);
-    const [discussions, setDiscussions] = useState<DiscussionProps[]>([]);
+    // const [discussions, setDiscussions] = useState<DiscussionProps[]>([]);
     const [posts, setPosts] = useState<PostProps[]>([]);
-    
 
-   /* useEffect(() => {
+    const discussions: DiscussionProps[] = [
+        {_id: '1', creator: '663cf771f92857ccb1716787', participants: [], title: 'Is PHP dead', description: 'A discussion on the current relevance and future of PHP in web development.', timestamp: new Date(), banner: '../assets/maxresdefault.png'},
+        {_id: '2', creator: '66463d0e7165e3d5524e432e', participants: [], title: 'Laravel VS Symfony ??', description: 'Comparing the features, performance, and community support of Laravel and Symfony.', timestamp: new Date(), banner: '../assets/LARAVEL_VS_SYMFONY.png'},
+        {_id: '3', creator: '663cf771f92857ccb1716787', participants: [], title: 'Node Js', description: 'Exploring the benefits and challenges of using Node.js for server-side development.', timestamp: new Date(), banner: '../assets/1671537942-mern-stack-1-mern-stack.png'},
+        {_id: '4', creator: '66463d0e7165e3d5524e432e', participants: [], title: 'Is PHP dead', description: 'A discussion on the current relevance and future of PHP in web development.', timestamp: new Date(), banner: '../assets/maxresdefault.png'},
+        {_id: '5', creator: '663cf771f92857ccb1716787', participants: [], title: 'Laravel VS Symfony ??', description: 'Comparing the features, performance, and community support of Laravel and Symfony.', timestamp: new Date(), banner: '../assets/LARAVEL_VS_SYMFONY.png'},
+        {_id: '6', creator: '66463d0e7165e3d5524e432e', participants: [], title: 'Node Js', description: 'Exploring the benefits and challenges of using Node.js for server-side development.', timestamp: new Date(), banner: '../assets/1671537942-mern-stack-1-mern-stack.png'}
+      ];
+
+    const handleClick = () => {
+      navigate('/createDiscussion');
+    };
+    
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setLoading(false);
+        }, 5000);
+
+        return () => clearTimeout(timeout);
+    }, []);
+
+    useEffect(() => {
         redirector(navigate);
         const fetchUserInfo = async () => {
             const userId = localStorage.getItem("user_id");
@@ -55,33 +76,28 @@ const Home = () => {
                 console.error("No user id found");
             }
             const {data} = await axios.get(`/user/profile/${userId}`);
-            console.log(data);
             setUser(data.data);
             localStorage.setItem("user_id", data.data._id);
             localStorage.setItem("username", data.data.fullName);
+            localStorage.setItem("profileImage", data.data.profileImage);
         };
-<<<<<<< HEAD
-        fetchProtectedData();
-    }, []);*/
-=======
         
         fetchUserInfo();
     }, []);
->>>>>>> 49ebd5bf54069dac826cf0e46b0c277b927b23ed
 
-    useEffect(() => {
-        const fetchDiscussions = async () => {
-            try {
-                const response = await axios.get("/discussion/user");
-                console.log(response.data);
-                setDiscussions(response.data);
-            } catch (error) {
-                console.error("Error fetching discussions:", error);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchDiscussions = async () => {
+    //         try {
+    //             const response = await axios.get("/discussion/user");
+    //             console.log(response.data);
+    //             setDiscussions(response.data);
+    //         } catch (error) {
+    //             console.error("Error fetching discussions:", error);
+    //         }
+    //     };
 
-        fetchDiscussions();
-    }, []);
+    //     fetchDiscussions();
+    // }, []);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -130,7 +146,8 @@ const Home = () => {
                         <input type="text" placeholder="Searching" className="search ml-4" style={{ backgroundColor: '#f0f0f0', border: 'none' }}/>
                         <button 
                             style={{backgroundColor : '#e3e3e3', marginLeft : '5px', width : '40px', height : '40px'}} 
-                            className="rounded-full">
+                            className="rounded-full"
+                            >
                                 <BellOutlined style={{fontSize : '20px'}} />
                         </button>
                     </div>
@@ -139,19 +156,12 @@ const Home = () => {
                 <section style={{ display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <p style={{ fontWeight: 'bold', marginBottom: '0px', marginLeft: '15px' }}>Your discussions</p>
-                        <button style={{color : '#969696'}}>
+                        <button style={{color : '#969696'}} onClick={handleClick}>
                             Create a new discussion &nbsp;
                             <FontAwesomeIcon icon={faPlusCircle} />
                         </button>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'row', overflowX: 'auto', maxWidth: '100%' }}>
-<<<<<<< HEAD
-                        {discussions.map((discussion, index) => (
-                            <div key={index} style={{ flex: '0 0 auto', marginRight: '10px' }}>
-                                <Discussion id={""} {...discussion} />
-                            </div>
-                        ))}
-=======
                         {discussions.length > 0 ? (
                             discussions.map((discussion, index) => (
                                 <div key={index} style={{ flex: '0 0 auto', marginRight: '10px' }}>
@@ -163,7 +173,6 @@ const Home = () => {
                                         You have no discussions. Discover new ones <a href="/" style={{ textDecoration: 'underline', color: '#ED080B' }}>here</a>.
                             </p>
                         )}
->>>>>>> 49ebd5bf54069dac826cf0e46b0c277b927b23ed
                     </div>
                 </section>
                 <br/><br/>
@@ -173,7 +182,7 @@ const Home = () => {
                                 <Post {...post} />
                             </div>
                     ))}
-                {loading && <LoadingOutlined style={{ fontSize: '50px', marginLeft: '50%', marginTop : '25px',  color : '#7808ED' }} />}
+                    {loading && <LoadingOutlined style={{ fontSize: '50px', marginLeft: '50%', marginTop : '25px',  color : '#7808ED' }} />}
                 </section>
             </div>
             <Sidebar />

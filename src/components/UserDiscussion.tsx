@@ -1,28 +1,25 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface DiscussionProps
 {
-<<<<<<< HEAD:src/components/Discussion.tsx
-    id: string;
-    img: string;
-=======
+    _id: string;
     creator: string;
     participants: string[];
->>>>>>> 49ebd5bf54069dac826cf0e46b0c277b927b23ed:src/components/UserDiscussion.tsx
     title: string;
     description: string;
     timestamp: Date;
     banner: string;
 }
 
-<<<<<<< HEAD:src/components/Discussion.tsx
-const Discussion: React.FC<DiscussionProps> = ({ id, img, title, members }) => {
-=======
 const UserDiscussion: React.FC<DiscussionProps> = ({ banner, title, participants }) => {
->>>>>>> 49ebd5bf54069dac826cf0e46b0c277b927b23ed:src/components/UserDiscussion.tsx
+    const navigate = useNavigate();
+    const handleClick = () => {
+        navigate(`/discussion/${title}`);
+      };
+    
     return (
       <div className="discussion" style={{ backgroundImage: `url(${banner})`, backgroundSize: 'cover', position : 'relative' }}>
         <div className="titleBoxStyle" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -33,10 +30,7 @@ const UserDiscussion: React.FC<DiscussionProps> = ({ banner, title, participants
                     <p style={{ marginBottom: '0', fontSize : '10px' }}>{participants.length} members</p>
                 </div>
             </div>
-            <Link to={`/discussion/${id}`}>
-                <FontAwesomeIcon icon={faExternalLinkAlt} />
-            </Link>
-
+            <button><FontAwesomeIcon icon={faExternalLinkAlt} onClick={handleClick}/></button>
         </div>
       </div>
     );

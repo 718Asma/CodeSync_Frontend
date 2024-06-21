@@ -4,9 +4,9 @@ import { LikeOutlined, DislikeOutlined, SendOutlined } from '@ant-design/icons';
 import ImageCarousel from './ImageCarousel';
 import axios from 'axios';
 
-interface PostProps
+type PostProps =
 {
-    id: string;
+    _id: string;
     owner: string;
     discussion: string;
     content: string;
@@ -16,12 +16,12 @@ interface PostProps
     timestamp: Date;
 }
 
-const Post: React.FC<PostProps> = ({ id, owner, discussion, images, content, likes, dislikes, timestamp }) => {
+const Post: React.FC<PostProps> = ({ _id, owner, discussion, images, content, likes, dislikes, timestamp }) => {
     
     const handleLike = () => {
         const addLike = async () => {
             try {
-                await axios.put(`/post/like/${id}`);
+                await axios.put(`/post/like/${_id}`);
                 console.log('Liked');
             } catch (error) {
                 console.error(error);
@@ -34,7 +34,7 @@ const Post: React.FC<PostProps> = ({ id, owner, discussion, images, content, lik
     const handleDislike = () => {
         const addDislike = async () => {
             try {
-                await axios.put(`/post/dislike/${id}`);
+                await axios.put(`/post/dislike/${_id}`);
                 console.log('Disliked');
             } catch (error) {
                 console.error(error);
