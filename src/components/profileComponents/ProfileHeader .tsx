@@ -14,6 +14,13 @@ const ProfileHeader = ({ data }: ProfileHeaderProps) => {
         const selectedFile = e.target.files[0];
         setFile(selectedFile);
         if (selectedFile) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target) {
+                    setImagePath(event.target.result as string);
+                }
+            };
+            reader.readAsDataURL(selectedFile);
             await handleSubmit(selectedFile);
         }
     };
@@ -33,7 +40,7 @@ const ProfileHeader = ({ data }: ProfileHeaderProps) => {
                 }
             );
             console.log(response.data);
-            setImagePath(response.data.filePath);
+            
         } catch (error) {
             console.error("Error uploading file:", error);
         }
@@ -48,7 +55,7 @@ const ProfileHeader = ({ data }: ProfileHeaderProps) => {
             {data && (
                 <div style={{boxShadow: '5px 0px 10px rgba(0, 0, 0, 0.1)',width:"1200px",position: "relative"}} className="rounded-xl bg-white ">
                     <div style={{height:"300px",width:"1200px",  }} className=" bg-white-100 rounded-xl ">
-                    <img src={`http://localhost:3000/${data.data.coverImage}`} alt=""style={{ width: "100%", height: "100%", objectFit: "cover" }} className="rounded-t-xl" />
+                    <img src={imagePath || `http://localhost:3000/${data.data.coverImage}`} alt=""style={{ width: "100%", height: "100%", objectFit: "cover" }} className="rounded-t-xl" />
                     <img src={`http://localhost:3000/${data.data.profileImage}`} style={{height:"150px",width:"150px",position: "absolute", top: "225px", left: "10%" ,objectFit: "cover" }}  className="bg-white rounded-full"/>
                     {/* <button
                      style={{width:"155px",position: "absolute", top: "225px", left: "81%" }}
