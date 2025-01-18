@@ -1,9 +1,9 @@
+import { NavLink } from 'react-router-dom';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark, faCog, faComments, faEnvelope, faHouse, faUser } from "@fortawesome/free-solid-svg-icons";
-import { library } from "@fortawesome/fontawesome-svg-core";
 import { faCopyright as faCopyrightRegular } from '@fortawesome/free-regular-svg-icons';
 
-library.add(faBookmark, faCog, faComments, faEnvelope, faHouse, faUser, faCopyrightRegular);
 
 const Navbar = () => {
     const userId = localStorage.getItem("user_id");
@@ -14,48 +14,54 @@ const Navbar = () => {
                 <div className="flex items-center mb-2">
                     <img src="../assets/Untitled-2-02.png" alt="CodeSync" className="mr-2" />
                 </div>
-                <a
-                    href="/"
+                <NavLink
+                    to="/"
                     className="button mb-1 my-2 home-button"
+                    style={{backgroundColor: window.location.pathname === '/' ? '#7808ED' : '', color: window.location.pathname === '/' ? 'white' : ''}}
                 >
                     <FontAwesomeIcon icon={faHouse} />&nbsp;
                     Home
-                </a>
-                <a
-                    href={`/user/profile/${userId}`}
+                </NavLink>
+                <NavLink
+                    to={`/user/profile/${userId}`}
                     className="button mb-1 my-2"
+                    style={{backgroundColor: window.location.pathname === `/user/profile/${userId}` ? '#7808ED' : '', color: window.location.pathname === `/user/profile/${userId}` ? 'white' : ''}}
                 >
                     <FontAwesomeIcon icon={faUser} />&nbsp;
                     Profile
-                </a>
-                <a
-                    href="/"
+                </NavLink>
+                <NavLink
+                    to={`/saved/${userId}`}
                     className="button mb-1 my-2"
+                    style={{backgroundColor: window.location.pathname === `/saved/${userId}` ? '#7808ED' : '', color: window.location.pathname === `/saved/${userId}` ? 'white' : ''}}
                 >
                     <FontAwesomeIcon icon={faBookmark} />&nbsp;
                     Saved
-                </a>
-                <a
-                    href="/discover"
+                </NavLink>
+                <NavLink
+                    to="/discover"
                     className="button mb-1 my-2"
+                    style={{backgroundColor: window.location.pathname === '/discover' ? '#7808ED' : '', color: window.location.pathname === '/discover' ? 'white' : ''}}
                 >
                     <FontAwesomeIcon icon={faComments} />&nbsp;
                     Explore
-                </a>
-                <a
-                    href="/chat"
+                </NavLink>
+                <NavLink
+                    to="/chat"
                     className="button mb-1 my-2"
+                    style={{backgroundColor: window.location.pathname === '/chat' ? '#7808ED' : '', color: window.location.pathname === '/chat' ? 'white' : ''}}
                 >
                     <FontAwesomeIcon icon={faEnvelope} />&nbsp;
                     Message
-                </a>
-                <a
-                    href="/"
+                </NavLink>
+                <NavLink
+                    to={`/settings/account`}
                     className="button mb-1 my-2"
+                    style={{backgroundColor: window.location.pathname === '/settings/account' ? '#7808ED' : '', color: window.location.pathname === '/settings/account' ? 'white' : ''}}
                 >
                     <FontAwesomeIcon icon={faCog} />&nbsp;
-                    Setting
-                </a>
+                    Settings
+                </NavLink>
             </div>
             <div className="mt-auto" style={{fontSize:'12px'}}>
                 CodeSync <FontAwesomeIcon icon={faCopyrightRegular} /> Copyright 2024

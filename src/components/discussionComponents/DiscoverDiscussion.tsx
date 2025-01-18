@@ -1,27 +1,26 @@
-import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-type DiscussionProps = {
-    _id: string;
-    creator: string;
-    participants: string[];
-    title: string;
-    description: string;
-    timestamp: Date;
-    banner: string;
-}
+import { Discussion } from "../../classes/discussion";
 
-const DiscoverDiscussion: React.FC<DiscussionProps> = ({ banner, title, description }) => {
+import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+
+const DiscoverDiscussion: React.FC<Discussion> = ({ _id, banner, title, description }) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate(`/discussion/${title}`);
+        navigate(`/discussion/${_id}`);
     };
 
     return (
-        <div className='discussionPage' style={{ backgroundImage: `url(${banner})`}}>
+        <div className="discussionPage" onClick={handleClick} style={{ 
+          backgroundImage: `url(${banner.replace(/\\/g, '/')})`, 
+          backgroundSize: 'cover', 
+          backgroundPosition: 'center',
+          position: 'relative' 
+        }}>
             <div className="titleBoxStyle" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
                     <h2 style={{ fontWeight: 'bold', fontSize:'20px'}}>{title}</h2>

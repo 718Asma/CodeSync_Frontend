@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "../utils/axios";
+import { aiResponse } from "../services/messageService";
 
 const ChatGPT = () => {
     const [prompt, setPrompt] = useState("");
@@ -9,10 +9,7 @@ const ChatGPT = () => {
     const handleChatWithAI = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.post("/message/ai", {
-                prompt,
-                aiKey: import.meta.env.VITE_OPENAI_API_KEY,
-            });
+            const response = await aiResponse(prompt, import.meta.env.VITE_OPENAI_API_KEY);
             setResponse(response.data.message);
         } catch (error) {
             console.error("Error:", error);

@@ -1,60 +1,71 @@
-import { BellOutlined, LoadingOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
+
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
-import DiscoverDiscussion from "../components/DiscoverDiscussion";
-import { useEffect, useState } from "react";
-import axios, { AxiosResponse } from "axios";
+import DiscoverDiscussion from "../components/discussionComponents/DiscoverDiscussion";
+import DiscussionForm from "../forms/DiscussionForm";
+import { Discussion } from "../classes/discussion";
+import { getAllDiscussions, getDiscussionByName } from "../services/discussionService";
 
-type DiscussionProps =
-{
-    _id: string;
-    creator: string;
-    participants: [];
-    title: string;
-    description: string;
-    timestamp: Date;
-    banner: string;
-}
+import { LoadingOutlined } from "@ant-design/icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 
 const Discover = () => {
-    const [discussions, setDiscussions] = useState<DiscussionProps[]>([]);
-
+    const [discussions, setDiscussions] = useState<Discussion[]>([]);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [isOpen, setIsOpen] = useState(false);
+    const [allRetrieved, setAllRetrieved] = useState(false);
+
+    const togglePopup = () => {
+        setIsOpen(!isOpen);
+    };
+
+    const handleClose = () => {
+        setIsOpen(false);
+    };
 
     useEffect(() => {
         const fetchDiscussion = async () => {
+            setLoading(true);
             try {
-                const token = localStorage.getItem('access_token');
-                const response = await axios.get(`http://localhost:3000/discussion/all?page=${page}`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                console.log(response);
-                if (response.data) {
-                    if (page === 1) {
-                        setDiscussions(response.data.discussions);
+                const discussions = await (searchTerm 
+                    ? getDiscussionByName(searchTerm) 
+                    : getAllDiscussions(page, 5)
+                );
+    
+                if (discussions.length > 0) {
+                    if (searchTerm) {
+                        setDiscussions(discussions);
                     } else {
-                        setDiscussions(prevDiscussions => [...prevDiscussions, ...response.data.discussions]);
+                        setDiscussions(prevDiscussions => {
+                            const uniqueDiscussions = discussions.filter(
+                                (newDiscussion: Discussion) =>
+                                    !prevDiscussions.some(prevPost => prevPost._id === newDiscussion._id)
+                            );
+                            return [...prevDiscussions, ...uniqueDiscussions];
+                        });
                     }
                 } else {
-                    console.error('Unexpected response data:', response.data);
+                    console.log('No more discussions to fetch.');
+                    setAllRetrieved(true);
                 }
-                setLoading(false); // Set loading to false after fetching data
             } catch (error) {
                 console.error('Error fetching discussion:', error);
+            } finally {
+                setLoading(false); // Ensure loading state is reset
             }
         };
     
         fetchDiscussion();
-    }, [page]);
-    
-    console.log(discussions);
+    }, [page, searchTerm]);
 
     const handleScroll = () => {
-        if(window.innerHeight + document.documentElement.scrollTop + 1 >= document.documentElement.offsetHeight)
+        if(window.innerHeight + document.documentElement.scrollTop + 1 >= document.documentElement.scrollHeight)
         {
             setLoading(true);
             setPage(prev => prev + 1);
@@ -66,46 +77,63 @@ const Discover = () => {
     return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    useEffect(() => {
-        const fetchDiscussions = async () => {
-            try {
-                const response = await axios.get("/discussion/all", {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-                    },
-                });
-                console.log("API Response:", response.data); // Check response data in console
-                setDiscussions(response.data.discussions); // Assuming discussions are in response.data.discussions
-            } catch (error) {
-                console.error("Error fetching discussions:", error);
-            }
-        };
-    
-        fetchDiscussions();
-    }, []);
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        setSearchTerm(value);
+        setPage(1)
+    };
     
     return (
         <div className="flex h-screen">
             <Navbar />
             <div className="container mx-auto px-4 py-8" style={{ width: '67%' }}>
-                <header className="flex items-center justify-between" style={{marginBottom: '100px'}}> 
+                <header className="flex items-center justify-between"> 
                     <h1 className="text-3xl font-bold mb-1">&nbsp;Explore new Discussions</h1>
                     <div>
-                        <input type="text" placeholder="Searching" className="search ml-4" style={{ backgroundColor: '#f0f0f0', border: 'none' }}/>
-                        <button 
-                            style={{backgroundColor : '#e3e3e3', marginLeft : '5px', width : '40px', height : '40px'}} 
-                            className="rounded-full">
-                                <BellOutlined style={{fontSize : '20px'}} />
-                        </button>
+                        <input
+                            type="text"
+                            placeholder="Searching..."
+                            className="search ml-4"
+                            style={{ backgroundColor: '#f0f0f0', border: 'none' }}
+                            value={searchTerm}
+                            onChange={handleSearchChange}/>
                     </div>
                 </header>
-                <section>
-                {discussions.map((discussion, index) => (
+                <div className="flex justify-end items-center" style={{ marginBottom: '50px', marginRight: '1%', marginTop: '15px' }}>
+                    <button onClick={togglePopup} style={{ color: '#969696' }}><FontAwesomeIcon icon={faPlusCircle} />&nbsp; Create a new discussion</button>
+                    <Popup
+                        trigger={<div></div>}
+                        open={isOpen}
+                        modal
+                        nested
+                        closeOnDocumentClick={false}
+                        closeOnEscape={false}
+                        onClose={handleClose}
+                    >
+                        <button onClick={handleClose} style={{ color: '#818181', position: 'absolute', top: '5px', right: '5px', cursor: 'pointer', background: 'transparent', border: '1px white solid', fontSize: '40px' }}>
+                            &times;
+                        </button>
+                        <DiscussionForm />
+                    </Popup>
+                </div>
+                <section> 
+                    {discussions.map((discussion, index) => (
                         <div key={index} style={{ flex: '0 0 auto', marginRight: '10px' }}>
                             <DiscoverDiscussion {...discussion} />
                         </div>
-                ))}
-                {loading && <LoadingOutlined style={{ fontSize: '50px', marginLeft: '50%', marginTop : '25px',  color : '#7808ED' }} />}
+                    ))}
+                    {loading ? (
+                        <LoadingOutlined style={{ fontSize: '50px', marginLeft: '50%', marginTop: '25px', color: '#7808ED' }} />
+                    ) : allRetrieved ? (
+                        <div style={{ textAlign: 'center', marginTop: '25px', fontFamily: 'cursive', marginBottom: '25px' }}>
+                            <p style={{ fontSize: '28px', color: '#7808ED' }}>
+                                Woohoo! You've explored everything! 🎉  
+                            </p>
+                            <p style={{ fontSize: '18px', color: '#7808ED' }}>
+                                We hope something sparked your curiosity!
+                            </p>
+                        </div>
+                    ) : null}
                 </section>
             </div>
             <Sidebar />

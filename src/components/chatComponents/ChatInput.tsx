@@ -45,7 +45,7 @@ export default function ChatInput(props: ChatInputProps) {
                 />
                 <button
                     type="submit"
-                    className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+                    className="px-4 py-2 rounded-lg bg-[#7808ED] text-white hover:bg-[#4a0594] focus:outline-none focus:bg-[#4a0594]"
                 >
                     Send
                 </button>

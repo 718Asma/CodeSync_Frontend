@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import axios from "../utils/axios";
+
+import { searchUsersByName } from "../services/userService";
+
 import { TextInput, Avatar, List, ListItem, Group, Text } from "@mantine/core";
 
 type SearchBarProps = {
@@ -13,22 +15,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ onUserSelect }) => {
     const handleSearch = async (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
         if (event.target.value.length > 2) {
-            const { data } = await axios.get(
-                `/user/search-users?name=${event.target.value}`
-            );
-            let res = data.data;
+            const data = await searchUsersByName(event.target.value);
+            let res = data;
+            
             const userId = localStorage.getItem("user_id");
             res = res.filter((user: any) => user._id !== userId);
-            for (let i = 0; i < res.length; i++) {
-                if (!res[i].profileImage)
-                    res[i].profileImage =
-                        "http://localhost:3000/assets/images/avatar.png";
-                else {
-                    res[
-                        i
-                    ].profileImage = `http://localhost:3000/${res[i].profileImage}`;
-                }
-            }
             setResults(res);
         } else {
             setResults([]);
@@ -43,7 +34,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onUserSelect }) => {
     };
 
     return (
-        <div className="relative w-full max-w-md mx-auto mb-4">
+        <div className="relative w-full max-w-md mx-4">
             <TextInput
                 value={searchTerm}
                 onChange={handleSearch}

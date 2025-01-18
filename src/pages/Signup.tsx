@@ -1,9 +1,23 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { useFormik, FormikErrors } from "formik";
 import * as yup from "yup";
-import axios from "../utils/axios";
+
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardFooter,
+} from "../ui/card";
+import { Alert, AlertDescription } from "../ui/alert";
+import { Logo } from "../ui/logo";
 import redirector from "../utils/redirector";
-import { useNavigate } from "react-router-dom";
+import { register } from "../services/authService";
 
 interface SignupFormValues {
     fullName: string;
@@ -16,39 +30,40 @@ interface ExtendedFormikErrors extends FormikErrors<SignupFormValues> {
     general?: string;
 }
 
+const validationSchema = yup.object({
+    fullName: yup
+        .string()
+        .min(3, "Full name should consist of a minimum of 3 characters.")
+        .max(100, "Full name should not exceed 100 characters.")
+        .matches(
+            /^[\w\s'-]+$/,
+            "Full name can only contain letters, spaces, hyphens, or apostrophes."
+        )
+        .required("Full name is required"),
+    username: yup
+        .string()
+        .min(3, "Username should consist of a minimum of 3 characters.")
+        .max(100, "Username should not exceed 100 characters.")
+        .matches(/^[a-zA-Z0-9]+$/, "Username must be alphanumeric.")
+        .required("Username is required"),
+    password: yup
+        .string()
+        .min(8, "Password should consist of a minimum of 8 characters.")
+        .max(100, "Password should not exceed 100 characters.")
+        .matches(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+            "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character."
+        )
+        .required("Password is required"),
+    confirmPassword: yup
+        .string()
+        .oneOf([yup.ref("password"), undefined], "Passwords do not match")
+        .required("Confirm password is required"),
+});
+
 const Signup = () => {
     const navigate = useNavigate();
-
-    const validationSchema = yup.object({
-        fullName: yup
-            .string()
-            .min(3, "Full name should consist of a minimum of 3 characters.")
-            .max(100, "Full name should not exceed 100 characters.")
-            .matches(
-                /^[\w\s'-]+$/,
-                "Full name can only contain letters, spaces, hyphens, or apostrophes."
-            )
-            .required("Full name is required"),
-        username: yup
-            .string()
-            .min(3, "Username should consist of a minimum of 3 characters.")
-            .max(100, "Username should not exceed 100 characters.")
-            .matches(/^[a-zA-Z0-9]+$/, "Username must be alphanumeric.")
-            .required("Username is required"),
-        password: yup
-            .string()
-            .min(8, "Password should consist of a minimum of 8 characters.")
-            .max(100, "Password should not exceed 100 characters.")
-            .matches(
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-                "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character."
-            )
-            .required("Password is required"),
-        confirmPassword: yup
-            .string()
-            .oneOf([yup.ref("password"), undefined], "Passwords do not match")
-            .required("Confirm password is required"),
-    });
+    const [generalError, setGeneralError] = useState<string | null>(null);
 
     const formik = useFormik<SignupFormValues>({
         initialValues: {
@@ -60,12 +75,12 @@ const Signup = () => {
         validationSchema: validationSchema,
         onSubmit: async (values, { setSubmitting, setErrors }) => {
             try {
-                const res = await axios.post("/auth/signup", values);
-
-                const { refresh_token, access_token, user_id } = res.data;
-                localStorage.setItem("access_token", access_token);
-                localStorage.setItem("refresh_token", refresh_token);
-                localStorage.setItem("user_id", user_id);
+                await register(
+                    values.fullName,
+                    values.username,
+                    values.password,
+                    values.confirmPassword
+                );
                 navigate("/");
             } catch (error: any) {
                 if (
@@ -83,10 +98,9 @@ const Signup = () => {
                         );
                     setErrors(serverErrors);
                 } else {
-                    setErrors({
-                        general:
-                            "An error occurred while signing up. Please try again.",
-                    } as ExtendedFormikErrors);
+                    setGeneralError(
+                        "An error occurred while signing up. Please try again."
+                    );
                 }
             } finally {
                 setSubmitting(false);
@@ -99,143 +113,119 @@ const Signup = () => {
     }, [navigate]);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-            <form
-                className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-xs"
-                onSubmit={formik.handleSubmit}
-            >
-                <h1 className="text-2xl font-bold mb-4">Sign Up</h1>
-                {(formik.errors as ExtendedFormikErrors).general && (
-                    <div className="text-red-500 mb-4">
-                        {(formik.errors as ExtendedFormikErrors).general}
-                    </div>
-                )}
-                <div className="mb-4">
-                    <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="fullName"
-                    >
-                        Full name:
-                    </label>
-                    <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
-                            formik.touched.fullName && formik.errors.fullName
-                                ? "border-red-500"
-                                : ""
-                        }`}
-                        type="text"
-                        id="fullName"
-                        name="fullName"
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.fullName}
-                        placeholder="Enter your full name"
-                    />
-                    {formik.touched.fullName && formik.errors.fullName ? (
-                        <p className="text-red-500 text-xs italic">
-                            {formik.errors.fullName}
-                        </p>
-                    ) : null}
-                </div>
-                <div className="mb-4">
-                    <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="username"
-                    >
-                        Username:
-                    </label>
-                    <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
-                            formik.touched.username && formik.errors.username
-                                ? "border-red-500"
-                                : ""
-                        }`}
-                        type="text"
-                        id="username"
-                        name="username"
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.username}
-                        placeholder="Choose a username"
-                    />
-                    {formik.touched.username && formik.errors.username ? (
-                        <p className="text-red-500 text-xs italic">
-                            {formik.errors.username}
-                        </p>
-                    ) : null}
-                </div>
-                <div className="mb-4">
-                    <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="password"
-                    >
-                        Password:
-                    </label>
-                    <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
-                            formik.touched.password && formik.errors.password
-                                ? "border-red-500"
-                                : ""
-                        }`}
-                        type="password"
-                        id="password"
-                        name="password"
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.password}
-                        placeholder="Enter your password"
-                    />
-                    {formik.touched.password && formik.errors.password ? (
-                        <p className="text-red-500 text-xs italic">
-                            {formik.errors.password}
-                        </p>
-                    ) : null}
-                </div>
-                <div className="mb-4">
-                    <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="confirmPassword"
-                    >
-                        Confirm password:
-                    </label>
-                    <input
-                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
-                            formik.touched.confirmPassword &&
-                            formik.errors.confirmPassword
-                                ? "border-red-500"
-                                : ""
-                        }`}
-                        type="password"
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.confirmPassword}
-                        placeholder="Confirm your password"
-                    />
-                    {formik.touched.confirmPassword &&
-                    formik.errors.confirmPassword ? (
-                        <p className="text-red-500 text-xs italic">
-                            {formik.errors.confirmPassword}
-                        </p>
-                    ) : null}
-                </div>
-                <div className="mb-6">
-                    <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        type="submit"
-                        disabled={formik.isSubmitting}
-                    >
-                        {formik.isSubmitting ? "Signing up..." : "Sign Up"}
-                    </button>
-                </div>
-            </form>
-            <div className="text-center mt-4">
-                <p>Already signed up?</p>
-                <a className="text-blue-500" href="/auth/login">
-                    Login
-                </a>
-            </div>
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-[#4a0594] to-[#940507]">
+            <Card className="w-full max-w-md shadow-lg bg-white/90 backdrop-blur-sm">
+                <CardHeader className="space-y-1">
+                    <Logo className="mx-auto mb-4 w-1/2" />
+                    <CardTitle className="text-3xl font-bold text-center text-black">
+                        Don’t just stand there <br/> Let the adventure begin! 🔥
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={formik.handleSubmit} className="space-y-4">
+                        {generalError && (
+                            <Alert variant="destructive">
+                                <AlertDescription>
+                                    {generalError}
+                                </AlertDescription>
+                            </Alert>
+                        )}
+                        <div className="space-y-2">
+                            <Label htmlFor="fullName" className="text-black">
+                                Full Name
+                            </Label>
+                            <Input
+                                id="fullName"
+                                type="text"
+                                placeholder="Enter your full name"
+                                {...formik.getFieldProps("fullName")}
+                                className="border-[#7808ED] focus:ring-[#7808ED]"
+                            />
+                            {formik.touched.fullName &&
+                                formik.errors.fullName && (
+                                    <p className="text-sm text-[#ED080B]">
+                                        {formik.errors.fullName}
+                                    </p>
+                                )}
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="username" className="text-black">
+                                Username
+                            </Label>
+                            <Input
+                                id="username"
+                                type="text"
+                                placeholder="Choose a username"
+                                {...formik.getFieldProps("username")}
+                                className="border-[#7808ED] focus:ring-[#7808ED]"
+                            />
+                            {formik.touched.username &&
+                                formik.errors.username && (
+                                    <p className="text-sm text-[#ED080B]">
+                                        {formik.errors.username}
+                                    </p>
+                                )}
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="password" className="text-black">
+                                Password
+                            </Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                placeholder="Enter your password"
+                                {...formik.getFieldProps("password")}
+                                className="border-[#7808ED] focus:ring-[#7808ED]"
+                            />
+                            {formik.touched.password &&
+                                formik.errors.password && (
+                                    <p className="text-sm text-[#ED080B]">
+                                        {formik.errors.password}
+                                    </p>
+                                )}
+                        </div>
+                        <div className="space-y-2">
+                            <Label
+                                htmlFor="confirmPassword"
+                                className="text-black"
+                            >
+                                Confirm Password
+                            </Label>
+                            <Input
+                                id="confirmPassword"
+                                type="password"
+                                placeholder="Confirm your password"
+                                {...formik.getFieldProps("confirmPassword")}
+                                className="border-[#7808ED] focus:ring-[#7808ED]"
+                            />
+                            {formik.touched.confirmPassword &&
+                                formik.errors.confirmPassword && (
+                                    <p className="text-sm text-[#ED080B]">
+                                        {formik.errors.confirmPassword}
+                                    </p>
+                                )}
+                        </div>
+                        <Button
+                            type="submit"
+                            className="w-full bg-[#7808ED] hover:bg-[#6007BA] text-white"
+                            disabled={formik.isSubmitting}
+                        >
+                            {formik.isSubmitting ? "Signing up..." : "Sign Up"}
+                        </Button>
+                    </form>
+                </CardContent>
+                <CardFooter>
+                    <p className="text-sm text-center w-full text-gray-600">
+                        Already have an account?{" "}
+                        <a
+                            href="/auth/login"
+                            className="text-[#ED080B] hover:text-[#940507] hover:underline font-medium"
+                        >
+                            Log In
+                        </a>
+                    </p>
+                </CardFooter>
+            </Card>
         </div>
     );
 };

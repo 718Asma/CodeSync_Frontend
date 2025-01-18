@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../utils/axios";
+
+import { getUserProfile } from "../../services/userService";
+
 import { Avatar } from "@mantine/core";
 
 type CurrentUserInfo = {
@@ -15,13 +17,9 @@ function NoSelectedContact({ currentUser }: { currentUser?: CurrentUserInfo }) {
 
     const fetchUserDetails = async (userId: string) => {
         try {
-            const { data } = await axios.get(`user/profile/${userId}`);
+            const { data } = await getUserProfile(userId);
             let { _id, fullName, profileImage } = data.data;
-            if (!profileImage) {
-                profileImage = "http://localhost:3000/assets/images/avatar.png";
-            } else {
-                profileImage = `http://localhost:3000/${profileImage}`;
-            }
+           
             setUser({ _id, fullName, profileImage });
         } catch (error) {
             console.error("Error fetching user details:", error);

@@ -24,6 +24,7 @@ input.search
 {
     background-color: #A864FF;
     color: #FFFFFF;
+    text-decoration: none;
 }
 
 .side
@@ -126,14 +127,14 @@ ol li
 
 .post
 {
-    margin-top: 50px;
+    margin-top: 40px;
     margin-left: auto;
     margin-right: auto;
     padding: 5px;
-    width: 85%;
+    /* width: 85%; */
     border-radius: 25px;
-    display: flex;
-    flex-direction: row;
+    /* display: flex;
+    flex-direction: row; */
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
     overflow: hidden; /* Or use overflow: auto; to allow scrolling */
 }
@@ -141,16 +142,18 @@ ol li
 
 .post table
 {
-    width: auto;
     border-collapse: collapse;
+    height: 500px;
+    width: 100%;
 }
 
 .desc
 {
-    font-size: small;
+    font-size: smaller;
     color: #818181;
-    vertical-align: top;
     padding: 5px;
+    /* float: right; */
+    /* vertical-align: top; */
     /* border: 1px black solid; */
 }
 
@@ -166,6 +169,21 @@ ol li
     height: 100%;
     border-top-left-radius: 5%;
     border-top-right-radius: 5%;
+}
+
+input.comment
+{
+    outline: none;
+    border: none;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+}
+
+input.comment:focus
+{
+    outline: none;
+    border-bottom: 1px solid #818181;
 }
 
 hr
@@ -198,6 +216,6 @@ hr
     margin-left: auto;
     margin-right: auto;
     margin-top: 50px;
-    width: 875px;
-    height: 375px;
+    width: 90%;
+    height: 500px;
 }

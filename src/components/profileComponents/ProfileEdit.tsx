@@ -1,13 +1,19 @@
 import { useState } from "react";
-import axios from "../../utils/axios";
+import { useNavigate } from "react-router-dom";
+
+import { deleteAccount, updateProfileDetails, uploadProfileImage } from "../../services/userService";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "react-toastify";
 
 type ProfileEditProps = {
     data: any;
 };
 
 const ProfileEdit = ({ data }: ProfileEditProps) => {
+    const navigate = useNavigate();
+
     const [file, setFile] = useState<File | null>(null);
     const [imagePath, setImagePath] = useState("");
 
@@ -30,19 +36,10 @@ const ProfileEdit = ({ data }: ProfileEditProps) => {
         e.preventDefault();
         
         if (file) {
-            const formData = new FormData();
-            formData.append("profileImage", file);
-
             try {
-                console.log(formData.get("profileImage"));
-                const response = await axios.post(
-                    "/user/upload-profile-image",
-                    formData,
-                    {
-                        headers: { "Content-Type": "multipart/form-data" },
-                    }
-                );
+                const response = await uploadProfileImage(file);
                 console.log(response.data);
+
                 setImagePath(response.data.filePath);
             } catch (error) {
                 console.error("Error uploading file:", error);
@@ -72,36 +69,47 @@ const ProfileEdit = ({ data }: ProfileEditProps) => {
         console.log(profileDetails);
         
         try {
-            const response = await axios.post("user/update-profile-details", TrimmedProfileDetails);
+            const response = await updateProfileDetails(TrimmedProfileDetails);
             console.log(response.data);
         } catch (error) {
             console.error("Error updating profile details:", error);
         }
     };
 
+    const handleDelete = async () => {
+        try {
+            await deleteAccount();
+            toast.success("Account deleted successfully");
+            localStorage.clear();
+            navigate("/auth/login");
+        } catch (error) {
+            console.error("Error deleting account:", error);
+        }
+    };
+
     return (
-        <div>
+        <div >
             {data && (
                 <form onSubmit={handleSubmit}>
                     <div className="container mx-auto px-4 py-8 bg-gray-100">
                         <div className="mx-auto flex justify-around items-center space-x-5">
                             <div>
                                 <img 
-                                    style={{ width: "140px", height: "140px", objectFit: "cover" }} 
+                                    style={{ width: "150px", height: "150px", objectFit: "cover" }} 
                                     className="rounded-xl mb-3" 
-                                    src={imagePath || `http://localhost:3000/${data.data.profileImage}`} 
+                                    src={imagePath || data.profileImage} 
                                     alt="" 
                                 />
                                 <label
-                                    style={{ width: "140px" }}
+                                    style={{ width: "150px" }}
                                     htmlFor="photo"
-                                    className="cursor-pointer bg-white hover:bg-primary hover:text-white hover:border-transparent text-primary border border-primary font-semibold py-2 px-2 rounded-lg"
+                                    className="cursor-pointer bg-white hover:bg-primary text-[#7808ED] hover:text-[#4a0594] hover:border-[#4a0594] border border-[#7808ED] font-semibold py-2 px-2 rounded-lg"
                                 >
                                     <FontAwesomeIcon icon={faImage} />&nbsp;Change Photo
                                     <input type="file" id="photo" className="hidden" onChange={handleFileChange} />
                                 </label>
                             </div>
-                            <div style={{ width: "80%" }} className="m-auto">
+                            <div style={{ width: "80%", marginLeft: "4%" }} >
                                 <label className="block text-gray-700 text-sm font-bold mb-2 pt-5" htmlFor="bio">
                                     Bio:
                                 </label>
@@ -111,6 +119,7 @@ const ProfileEdit = ({ data }: ProfileEditProps) => {
                                     id="bio"
                                     name="bio"
                                     placeholder="Write something about yourself" 
+                                    value={data.bio}
                                 />
                             </div>
                         </div>
@@ -120,7 +129,7 @@ const ProfileEdit = ({ data }: ProfileEditProps) => {
                         <div style={{ width: "100%" }} className="flex justify-around flex-wrap">
                             <div style={{ width: "40%" }}>
                                 <label className="block text-gray-700 text-sm font-bold mb-2 pt-5" htmlFor="fullName">
-                                    Full name:
+                                    Full Name:
                                 </label>
                                 <input
                                     style={{ width: "100%" }}
@@ -129,6 +138,7 @@ const ProfileEdit = ({ data }: ProfileEditProps) => {
                                     id="fullName"
                                     name="fullName"
                                     placeholder="Enter your full name"
+                                    value={data.fullName}
                                 />
                             </div>
                             <div style={{ width: "40%" }}>
@@ -142,6 +152,7 @@ const ProfileEdit = ({ data }: ProfileEditProps) => {
                                     id="occupation"
                                     name="occupation"
                                     placeholder="Choose an occupation"
+                                    value={data.occupation}
                                 />
                             </div>
                             <div style={{ width: "40%" }}>
@@ -155,6 +166,7 @@ const ProfileEdit = ({ data }: ProfileEditProps) => {
                                     id="email"
                                     name="email"
                                     placeholder="Choose an email"
+                                    value={data.email}
                                 />
                             </div>
                             <div style={{ width: "40%" }}>
@@ -168,6 +180,7 @@ const ProfileEdit = ({ data }: ProfileEditProps) => {
                                     id="address"
                                     name="address"
                                     placeholder="Choose an address"
+                                    value={data.address}
                                 />
                             </div>
                             <div style={{ width: "40%" }}>
@@ -180,6 +193,7 @@ const ProfileEdit = ({ data }: ProfileEditProps) => {
                                     type="date"
                                     id="dateOfBirth"
                                     name="dateOfBirth"
+                                    value={data.dateOfBirth?.split("T")[0]}
                                 />
                             </div>
                             <div style={{ width: "40%" }}>
@@ -191,6 +205,7 @@ const ProfileEdit = ({ data }: ProfileEditProps) => {
                                     className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     id="gender"
                                     name="gender"
+                                    value={data.gender}
                                 >
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
@@ -199,16 +214,28 @@ const ProfileEdit = ({ data }: ProfileEditProps) => {
                             </div>
                         </div>
                     </div>
+                    <br />
+                    <div style={{ float: "left" }}>
+                        <button
+                            type="button"
+                            onClick={handleDelete}
+                            className="cursor-pointer bg-[#ED080B] hover:bg-[#940507] hover:text-white hover:border-transparent text-white border border-white font-semibold py-2 px-2 rounded-lg mx-1"
+                        >
+                            {" "}
+                            <i className="fa fa-trash"></i>{" "}
+                            Delete Account
+                        </button>
+                    </div>
                     <div style={{ float: "right" }}>
                         <button
                             type="button"
-                            className="cursor-pointer bg-white hover:bg-secondary hover:text-white hover:border-transparent text-secondary border border-secondary font-semibold py-2 px-2 rounded-lg mx-1"
+                            className="cursor-pointer bg-[#ffffff] hover:bg-[#818181] hover:text-white hover:border-transparent text-[#818181] border border-[#818181] font-semibold py-2 px-2 rounded-lg mx-1"
                         >
                             Cancel
                         </button>
                         <button 
                             type="submit"
-                            className="cursor-pointer bg-secondary border border-secondary text-white font-semibold py-2 px-2 rounded-lg"
+                            className="cursor-pointer bg-[#7808ED] hover:bg-[#4a0594] border border-[#ED080B] text-white font-semibold py-2 px-2 rounded-lg"
                         >
                             Save Changes
                         </button>

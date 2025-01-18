@@ -1,7 +1,12 @@
 import { useState } from "react";
-import axios from "../utils/axios";
+import { useNavigate } from "react-router-dom";
+
+import { changeBanner, createDiscussion } from "../services/discussionService";
+import { toast } from "react-toastify";
 
 const DiscussionForm = () => {
+    const navigate = useNavigate();
+
     const [title, setTitle] = useState("");
     console.log("Title:", title);
     const [description, setDescription] = useState("");
@@ -41,24 +46,17 @@ const DiscussionForm = () => {
             description: description,
         };
 
-        console.log("Form data:", formData);
-
         try {
-            const response = await axios.post("/discussion/create", formData);
-            console.log("Discussion created:", response.data);
-            const discussionId = response.data.discussion._id;
+            const response = await createDiscussion(formData.title, formData.description);
+            console.log("Discussion created:", response);
+
+            const discussionId = response.discussion._id;
 
             if (banner) {
-                const res = await axios.put(
-                    `/discussion/change-banner`,
-                    { banner: banner, discussionId: discussionId },
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
+                const res = await changeBanner(banner, discussionId);
                 console.log(res);
+                navigate(`/discussion/${discussionId}`);
+                toast.success("Discussion created successfully!");
             }
         } catch (error) {
             console.error("Error creating discussion:", error);
@@ -66,32 +64,59 @@ const DiscussionForm = () => {
     };
 
     return (
-        <form onSubmit={onSubmit}>
-            <div>
-                <label htmlFor="title">Title</label>
+        <form onSubmit={onSubmit} className="container mt-5" style={{ marginLeft: '18%', padding: '3% 5% 5% 0%' }}>
+            <div className="form-group" style={{marginBottom: '30px'}}>
+                <label htmlFor="title" style={{fontWeight: 'bold', fontSize: '24px'}}>
+                    <i className="fas fa-font"></i>&nbsp; Title
+                </label>
+
                 <input
                     id="title"
+                    className="form-control"
+                    style={{ width: '75%' }}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                 />
                 {errors.title && <p>{errors.title}</p>}
             </div>
 
-            <div>
-                <label htmlFor="description">Description</label>
-                <input
+            <div className="form-group" style={{marginBottom: '30px'}}>
+                <label htmlFor="description" style={{fontWeight: 'bold', fontSize: '24px'}}>
+                    <i className="fas fa-align-left"></i>&nbsp; Description
+                </label>
+
+                <textarea
                     id="description"
+                    className="form-control"
+                    rows={5}
+                    style={{ width: '75%' }}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                 />
                 {errors.description && <p>{errors.description}</p>}
             </div>
 
-            <div>
-                <label htmlFor="banner">Banner</label>
+            <div className="form-group" style={{marginBottom: '30px'}}>
+                <p style={{fontWeight: 'bold', fontSize: '24px'}}><i className="fas fa-image"></i>&nbsp; Banner</p>
+                <label
+                    htmlFor="banner"
+                    className="cursor-pointer font-semibold py-2"
+                    style={{
+                        backgroundColor: '#7808ED',
+                        borderColor: '#7808ED',
+                        height: '45px',
+                        borderRadius: '10px',
+                        color:'white',
+                        textAlign: 'center',
+                        padding: '5px',
+                        marginTop: '10px',
+                    }}
+                >
+                    Upload Banner
                 <input
                     id="banner"
                     type="file"
+                    className="form-control-file hidden"
                     accept="image/*"
                     onChange={(e) => {
                         if (e.target.files && e.target.files.length > 0) {
@@ -101,9 +126,25 @@ const DiscussionForm = () => {
                         }
                     }}
                 />
+                </label>
             </div>
 
-            <button type="submit">Create Discussion</button>
+            <button
+                type="submit"
+                className="btn"
+                style={{marginTop: '10px',
+                        backgroundColor: '#ED080B',
+                        borderColor: '#ED080B',
+                        fontWeight: 'bold',
+                        height: '45px',
+                        borderRadius: '10px',
+                        color:'white',
+                        float: 'right',
+                        marginRight: '17%',
+                        marginBottom: '10px'
+                    }}>
+                <i className="fas fa-plus"></i>&nbsp; Create Discussion
+            </button>
         </form>
     );
 };

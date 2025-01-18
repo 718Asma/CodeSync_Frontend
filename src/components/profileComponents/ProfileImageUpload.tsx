@@ -1,7 +1,8 @@
 import { useState } from "react";
-import axios from "../../utils/axios";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
+import { uploadProfileImage } from "../../services/userService";
 
 function ProfileImageUpload() {
     const [file, setFile] = useState(null);
@@ -13,19 +14,11 @@ function ProfileImageUpload() {
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        const formData = new FormData();
-        formData.append("profileImage", file!);
 
         try {
-            console.log(formData.get("profileImage"));
-            const response = await axios.post(
-                "/user/upload-profile-image",
-                formData,
-                {
-                    headers: { "Content-Type": "multipart/form-data" },
-                }
-            );
+            const response = await uploadProfileImage(file!);
             console.log(response.data);
+            
             setImagePath(response.data.filePath);
         } catch (error) {
             console.error("Error uploading file:", error);

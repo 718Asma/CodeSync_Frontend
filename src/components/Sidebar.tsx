@@ -1,52 +1,40 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { User } from "../classes/user";
+import { friendRequest } from "../classes/friendRequest";
+import { getUserProfile } from "../services/userService";
+import { getAllFriendRequests } from "../services/friendRequestService";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignOut } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import axios, { AxiosResponse } from 'axios';
+import { Avatar } from "@mantine/core";
 
-type userInfo = {
-    _id: string;
-    fullName: string;
-    profileImage: string;
-    bio: string;
-    occupation: string;
-};
-
-const Sidebar = ( ) => {
+const Sidebar = () => {
     const navigate = useNavigate();
-    
-    const [user, setUser] = useState<userInfo>();
+
+    const [user, setUser] = useState<User>();
+    const [pendingRequests, setPendingRequests] = useState<friendRequest[]>([]);
 
     const getUser = async () => {
         const userId = localStorage.getItem("user_id");
         if (userId) {
             try {
-                const response: AxiosResponse<{ data: userInfo }> = await axios.get(`http://localhost:3000/user/profile/${userId}`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-                    },
-                });
-                const { _id, fullName, profileImage, bio, occupation } = response.data.data;
-                const profileImgUrl = profileImage 
-                    ? `http://localhost:3000/${profileImage}`
-                    : "http://localhost:3000/assets/images/avatar.png";
-                setUser({ _id, fullName, profileImage: profileImgUrl, bio, occupation });
+                const response = await getUserProfile(userId);
+                const {_id, fullName, profileImage, bio, occupation, friends} = response;
+                setUser({_id, fullName, profileImage: profileImage, bio, occupation, friends});
+
+                const pendingResponse = await getAllFriendRequests(userId);
+                const receiverRequests = pendingResponse.filter((request: friendRequest) => request.receiver === userId);
+                setPendingRequests(receiverRequests);
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status === 401) {
-                    console.error("User not authenticated:", error.response.data);
-                    navigate("/auth/login");
-                } else {
-                    console.error("Error fetching user data:", error);
-                }
+                console.error("Error fetching user data:", error);
             }
         }
     };
 
     const handleLogout = () => {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        localStorage.removeItem("user_id");
-        localStorage.removeItem("username");
+        localStorage.clear();
         navigate("/auth/login");
     };
 
@@ -57,45 +45,114 @@ const Sidebar = ( ) => {
             getUser();
         }
     }, []);
-    
+
     return (
         <>
             {user && (
                 <aside className="w-1/6 side">
                     <div>
                         <div className="flex items-center mx-7 mt-7">
-                            <img src={user.profileImage} alt="Profile pic" className="mr-2" style={{ height: '50px', width: '50px' }} />
+                            <Avatar
+                                src={user?.profileImage}
+                                alt={user?.fullName}
+                                radius="xl"
+                                size="lg"
+                            />{" "}
+                            &nbsp;&nbsp;&nbsp;
                             <div>
-                                <p className='font-semibold'>{user?.fullName}</p>
+                                <p className="font-semibold">
+                                    {user?.fullName}
+                                </p>
                                 <button
                                     className="info"
                                     onClick={handleLogout}
-                                    style={{ color: '#ED080B' }}
+                                    style={{ color: "#ED080B" }}
                                 >
-                                    <FontAwesomeIcon icon={faSignOut} />&nbsp;
-                                    Log Out
+                                    <FontAwesomeIcon icon={faSignOut} />
+                                    &nbsp; Log Out
                                 </button>
                             </div>
                         </div>
                         {user.bio != null ? (
-                            <p className="info mx-7" style={{ fontSize: '15px', marginLeft: '50px', marginTop: '7.5px' }}>
+                            <p
+                                className="info mx-7"
+                                style={{
+                                    fontSize: "16.5px",
+                                    marginLeft: "50px",
+                                    marginTop: "10px",
+                                }}
+                            >
                                 {user.bio}
                             </p>
                         ) : user.occupation != null ? (
-                            <p className="info mx-7" style={{ fontSize: '15px', marginLeft: '50px', marginTop: '7.5px' }}>
+                            <p
+                                className="info mx-7"
+                                style={{
+                                    fontSize: "16.5px",
+                                    marginLeft: "50px",
+                                    marginTop: "10px",
+                                }}
+                            >
                                 {user.occupation}
                             </p>
                         ) : null}
-                        <br/>
-                        <div className="flex items-center mb-4">
-                            <p className="follow w-full"><span>427</span> Followers</p>
-                            <p className="follow w-full"><span>845</span> Following</p>
-                        </div>
+                        <br />
                     </div>
-                    <div className='mx-7'>
-                        <p style={{fontWeight : 'bold', fontSize:'20px'}}>Trending Topics</p>
+                    {/* <div className="mx-7">
+                        <p
+                            style={{
+                                fontWeight: "bold",
+                                fontSize: "20px",
+                                marginBottom: "10px",
+                            }}
+                        >
+                            Friend Requests
+                        </p>
+                        {pendingRequests.length > 0 ? (
+                            <>
+                                {pendingRequests.map((request, index) => (
+                                    <div
+                                        className="flex items-center gap-4 mb-4"
+                                        key={index}
+                                        onClick={() =>
+                                            navigate(`/user/profile/${request._id}`)
+                                        }
+                                    >
+                                        <Avatar
+                                            src={request?.sender.profileImage}
+                                            alt={request?.sender.fullName}
+                                            radius="xl"
+                                            size="lg"
+                                        />
+                                        <h2
+                                            className="text-[#818181] text-lg hover:text-[#ED080B]"
+                                            style={{ cursor: "pointer" }}
+                                        >
+                                            {request?.sender.fullName}
+                                        </h2>
+                                    </div>
+                                ))}
+                            </>
+                        ) : (
+                            <p className="text-sm text-[#818181] ml-2">
+                                Looks like you're on the "no one wants to talk to me" list! 😅
+                            </p>
+                        )}
+                    </div> */}
+                    <div className="mx-7">
+                        <p
+                            style={{
+                                fontWeight: "bold",
+                                fontSize: "20px",
+                                marginBottom: "10px",
+                            }}
+                        >
+                            Trending Topics
+                        </p>
                         <ol>
-                            <li><a>#Programming</a></li>
+                            <li>
+                                <a>#Programming</a>
+                            </li>
                             <li>#Python</li>
                             <li>#C++</li>
                             <li>#PHP</li>
@@ -105,16 +162,55 @@ const Sidebar = ( ) => {
                             <li>#Node_Js</li>
                         </ol>
                     </div>
-                    <br/>
-                    <div className='mx-7'>
-                        <p style={{fontWeight : 'bold', fontSize:'20px'}}>Friends</p>
-                        
+                    <br />
+                    <div className="mx-7">
+                        <p
+                            style={{
+                                fontWeight: "bold",
+                                fontSize: "20px",
+                                marginBottom: "10px",
+                            }}
+                        >
+                            Friends
+                        </p>
+                        {user.friends && user.friends.length > 0 ? (
+                            <>
+                                {user.friends.map((friend, index) => (
+                                    <div
+                                        className="flex items-center gap-4 mb-4"
+                                        key={index}
+                                        onClick={() =>
+                                            navigate(
+                                                `/user/profile/${friend._id}`
+                                            )
+                                        }
+                                    >
+                                        <Avatar
+                                            src={friend?.profileImage}
+                                            alt={friend?.fullName}
+                                            radius="xl"
+                                            size="lg"
+                                        />
+                                        <h2
+                                            className="text-[#818181] text-lg hover:text-[#ED080B]"
+                                            style={{ cursor: "pointer" }}
+                                        >
+                                            {friend?.fullName}
+                                        </h2>
+                                    </div>
+                                ))}
+                            </>
+                        ) : (
+                            <p className="text-sm text-[#818181] ml-2">
+                                Don’t be shy — invite some friends and start
+                                building your crew!🚀
+                            </p>
+                        )}
                     </div>
                 </aside>
             )}
         </>
     );
-            
-}
+};
 
 export default Sidebar;

@@ -1,12 +1,17 @@
 import { useEffect, useState, useRef } from "react";
-import axios from "../utils/axios";
-import { useNavigate } from "react-router-dom";
-import Contacts from "../components/Contacts";
-import NoSelectedContact from "../components/NoSelectedContact";
-import ChatContainer from "../components/ChatContainer";
+import { NavLink, useNavigate } from "react-router-dom";
+
 import { io, Socket } from "socket.io-client";
+
+import Contacts from "../components/chatComponents/Contacts";
+import NoSelectedContact from "../components/chatComponents/NoSelectedContact";
+import ChatContainer from "../components/chatComponents/ChatContainer";
 import SearchBar from "../components/SearchBar";
-import { Button, Loader } from "@mantine/core";
+import { getUserProfile, getUserContacts } from "../services/userService";
+
+import { Loader } from "@mantine/core";
+import { faArrowLeft, faRobot } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type CurrentUserInfo = {
     _id: string;
@@ -30,27 +35,31 @@ const Chat = () => {
     const [currentChat, setCurrentChat] = useState<Contact | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [rOnlineUsers, setROnlineUsers] = useState<string[]>([]);
+    
+
+    const handleGoBack = () => {
+        navigate(-1);
+    };
 
     const getUser = async () => {
         const userId = localStorage.getItem("user_id");
-        const { data } = await axios.get(`user/profile/${userId}`);
-        let { _id, fullName, profileImage } = data.data;
-        if (!profileImage)
-            profileImage = "http://localhost:3000/assets/images/avatar.png";
-        else profileImage = `http://localhost:3000/${profileImage}`;
-        setCurrentUser({ _id, fullName, profileImage, online: true });
+        if (userId) {
+            const data = await getUserProfile(userId);
+            let { _id, fullName, profileImage } = data;
+            setCurrentUser({ _id, fullName, profileImage, online: true });
+        }
     };
 
     const getContacts = async () => {
-        const { data } = await axios.get("message/contacts");
-        const contactsWithOnlineStatus = data.contacts.map((contact: any) => ({
-            ...contact,
-            profileImage: contact.profileImage
-                ? `http://localhost:3000/${contact.profileImage}`
-                : "http://localhost:3000/assets/images/avatar.png",
-            online: false, // Initialize all contacts as offline
-        }));
-        setContacts(contactsWithOnlineStatus);
+        const data = await getUserContacts();
+        // const contactsWithOnlineStatus = data.contacts.map((contact: any) => ({
+        //     ...contact,
+        //     profileImage: contact.profileImage
+        //         ? `http://localhost:3000/${contact.profileImage}`
+        //         : "http://localhost:3000/assets/images/avatar.png",
+        //     online: false, // Initialize all contacts as offline
+        // }));
+        setContacts(data);
         setIsLoading(false);
     };
 
@@ -123,11 +132,20 @@ const Chat = () => {
 
     return (
         <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4">
-            <SearchBar onUserSelect={changeUserContacts} />
+            <div className="w-full max-w-6xl flex justify-center items-center mb-4">
+                <NavLink
+                    to="/chatgpt"
+                    className="text-white bg-gray-300 rounded-full w-10 h-10 flex justify-center items-center"
+                >
+                    <FontAwesomeIcon icon={faRobot} />
+                </NavLink>
+                <SearchBar onUserSelect={changeUserContacts} />
+            </div>
             <div className="w-full max-w-6xl bg-white p-6 rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* <div className="w-full max-w-6xl bg-white p-6 rounded-lg shadow-md flex"> */}
                 {isLoading ? (
                     <div className="col-span-2 flex justify-center items-center">
-                        <Loader color="blue" />
+                        <Loader color="#7808ED" />
                     </div>
                 ) : (
                     <>
@@ -145,6 +163,9 @@ const Chat = () => {
                         ) : (
                             <NoSelectedContact currentUser={currentUser} />
                         )}
+                        <button onClick={handleGoBack} className="w-12 fixed top-6 left-6 text-[#7808ED] bg-white border p-2 rounded-lg">
+                            <FontAwesomeIcon icon={faArrowLeft} />
+                        </button>
                     </>
                 )}
             </div>

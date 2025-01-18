@@ -1,27 +1,25 @@
 import React from "react";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
-interface DiscussionProps
-{
-    _id: string;
-    creator: string;
-    participants: string[];
-    title: string;
-    description: string;
-    timestamp: Date;
-    banner: string;
-}
+import { Discussion } from "../../classes/discussion";
 
-const UserDiscussion: React.FC<DiscussionProps> = ({ banner, title, participants }) => {
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+
+
+const UserDiscussion: React.FC<Discussion> = ({ _id, banner, title, participants }) => {
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate(`/discussion/${title}`);
-      };
+        navigate(`/discussion/${_id}`);
+	};
     
     return (
-      <div className="discussion" style={{ backgroundImage: `url(${banner})`, backgroundSize: 'cover', position : 'relative' }}>
+      <div className="discussion" style={{ 
+        backgroundImage: `url(${banner.replace(/\\/g, '/')})`, 
+        backgroundSize: 'cover', 
+		backgroundPosition: 'center',
+        position: 'relative' 
+      }}>
         <div className="titleBoxStyle" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
                 <img src={banner} alt={title} className="rounded-full" style={{ objectFit : 'cover', width: '25px', height: '25px', marginRight: '10px' }} />

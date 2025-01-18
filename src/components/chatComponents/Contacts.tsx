@@ -68,11 +68,18 @@ export default function Contacts(props: ContactsProps) {
                             alt={contact.fullName}
                             radius="xl"
                             size="md"
-                            className={`border-2 ${
-                                contact.online ? "border-green-500" : ""
-                            }`}
+                            // className={`border-2 ${
+                            //     contact.online ? "border-green-500" : ""
+                            // }`}
                         />
-                        <h3 className="ml-4">{contact.fullName}</h3>
+                        <div>
+                            <h3 className="ml-4">{contact.fullName}</h3>
+                            {contact.online &&
+                                <p className="ml-4 text-gray-500">
+                                    <span className="text-green-400 mr-2 text-xs"><i className="fa-solid fa-circle"></i></span>Online
+                                </p>
+                            }
+                        </div>
                     </div>
                 ))}
             </ScrollArea>

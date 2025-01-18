@@ -1,22 +1,27 @@
-import { useEffect, useRef, useState } from "react";
-import axios from "../utils/axios";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import redirector from "../utils/redirector";
-
 import { GoogleLogin } from "@react-oauth/google";
+
 import { jwtDecode } from "jwt-decode";
+import { useFormik } from "formik";
+import * as yup from "yup";
 
-interface LoginResponse {
-    access_token: string;
-    refresh_token: string;
-    user_id: string;
-}
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardFooter,
+} from "../ui/card";
+import { Alert, AlertDescription } from "../ui/alert";
+import { Label } from "../ui/label";
+import { Separator } from "../ui/separator";
+import { Logo } from "../ui/logo";
+import redirector from "../utils/redirector";
+import { googleLogin, login } from "../services/authService";
 
-const setLocalStorage = (data: LoginResponse) => {
-    localStorage.setItem("access_token", data.access_token);
-    localStorage.setItem("refresh_token", data.refresh_token);
-    localStorage.setItem("user_id", data.user_id);
-};
 
 const GoogleLoginButton: React.FC = () => {
     const navigate = useNavigate();
@@ -29,8 +34,7 @@ const GoogleLoginButton: React.FC = () => {
             fullName: (decodedRes as any).name,
         };
         try {
-            const { data } = await axios.post("/auth/google", loginBody);
-            setLocalStorage(data);
+            await googleLogin(loginBody);
             navigate("/");
         } catch (err) {
             console.error("an error occurred with the login request: ", err);
@@ -41,136 +45,142 @@ const GoogleLoginButton: React.FC = () => {
         console.error("google login failed.");
     };
 
-    return <GoogleLogin onSuccess={onSuccess} onError={onFail} />;
+    return (
+      <GoogleLogin
+        onSuccess={onSuccess}
+        onError={onFail}
+        theme="filled_blue"
+        size="large"
+        shape="pill"
+      />
+    );
 };
+
+interface LoginFormValues {
+  username: string;
+  password: string;
+}
+
+const validationSchema = yup.object({
+  username: yup
+    .string()
+    .min(3, "Username should consist of a minimum of 3 characters.")
+    .max(100, "Username should not exceed 100 characters.")
+    .required("Username is required"),
+  password: yup
+    .string()
+    .min(8, "Password should consist of a minimum of 8 characters.")
+    .max(100, "Password should not exceed 100 characters.")
+    .required("Password is required"),
+});
+
 
 const Login = () => {
     const navigate = useNavigate();
-    const usernameRef = useRef<HTMLInputElement>(null);
-    const passwordRef = useRef<HTMLInputElement>(null);
-    const [error, setError] = useState<string[]>([]);
+    const [generalError, setGeneralError] = useState<string | null>(null);
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError([]);
-        const username = usernameRef.current?.value;
-        const password = passwordRef.current?.value;
-        if (!username)
-            setError((prevErrors) => [
-                ...prevErrors,
-                "Username must not be empty.",
-            ]);
-        if (!password)
-            setError((prevErrors) => [
-                ...prevErrors,
-                "Password must not be empty.",
-            ]);
-
-        if (username && username.length < 3)
-            setError((prevErrors) => [
-                ...prevErrors,
-                "Username must be at least 3 characters long.",
-            ]);
-
-        if (password && password.length < 8)
-            setError((prevErrors) => [
-                ...prevErrors,
-                "Password must be at least 8 characters long.",
-            ]);
-
-        if (error.length > 0) return;
-
-        let loginBody = {
-            username: username!,
-            password: password!,
-        };
+    const formik = useFormik<LoginFormValues>({
+      initialValues: {
+        username: "",
+        password: "",
+      },
+      validationSchema: validationSchema,
+      onSubmit: async (values, { setSubmitting }) => {
         try {
-            const { data } = await axios.post<LoginResponse>(
-                "/auth/login",
-                loginBody
-            );
-            setLocalStorage(data);
-            navigate("/");
-        } catch (error) {
-            console.error("Error: ", error);
-            setError((prevErrors) => [
-                ...prevErrors,
-                (error as any).response.data.message,
-            ]);
+          await login(values.username, values.password);
+          navigate("/");
+        } catch (error: any) {
+          console.error("Error: ", error);
+          setGeneralError(error.response?.data?.message || "An error occurred during login.");
+        } finally {
+          setSubmitting(false);
         }
-    };
+      },
+    });
 
     useEffect(() => {
         redirector(navigate);
         return () => {
-            setError([]);
+            setGeneralError(null);
         };
     }, []);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-            <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-xs">
-                <h1 className="text-2xl font-bold mb-4">Login</h1>
-                <div className="mb-4">
-                    <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="username"
-                    >
-                        Username:
-                    </label>
-                    <input
-                        ref={usernameRef}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        type="text"
-                        id="username"
-                        name="username"
-                        placeholder="Enter your username"
-                    />
-                </div>
-                <div className="mb-6">
-                    <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="password"
-                    >
-                        Password:
-                    </label>
-                    <input
-                        ref={passwordRef}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Enter your password"
-                    />
-                </div>
-                <div className="mb-6">
-                    <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        type="submit"
-                        onClick={handleLogin}
-                    >
-                        Login
-                    </button>
-                </div>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-[#4a0594] to-[#940507]">
+        <Card className="w-full max-w-md shadow-lg bg-white/95 backdrop-blur-sm">
+          <CardHeader className="space-y-1">
+            <Logo className="mx-auto mb-4 w-1/2" />
+            <CardTitle className="text-3xl font-bold text-center text-black">Welcome Back</CardTitle>
+            <p className="text-center text-gray-600">Sign in to your account</p>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={formik.handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="username" className="text-black">Username</Label>
+                <Input
+                  id="username"
+                //   name="username"
+                  placeholder="Enter your username"
+                  {...formik.getFieldProps('username')}
+                  className={`w-full px-3 py-2 border-[#7808ED] focus:ring-[#7808ED] rounded-md ${
+                    formik.touched.username && formik.errors.username ? 'border-[#ED080B]' : ''
+                  }`}
+                />
+                {formik.touched.username && formik.errors.username && (
+                  <p className="text-sm text-[#ED080B]">{formik.errors.username}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-black">Password</Label>
+                <Input
+                  type="password"
+                  id="password"
+                //   name="password"
+                  placeholder="Enter your password"
+                  {...formik.getFieldProps('password')}
+                  className={`w-full px-3 py-2 border-[#7808ED] focus:ring-[#7808ED] rounded-md ${
+                    formik.touched.password && formik.errors.password ? 'border-[#ED080B]' : ''
+                  }`}
+                />
+                {formik.touched.password && formik.errors.password && (
+                  <p className="text-sm text-[#ED080B]">{formik.errors.password}</p>
+                )}
+              </div>
+              <Button 
+                type="submit" 
+                className="w-full bg-[#7808ED] hover:bg-[#4a0594] text-white" 
+                disabled={formik.isSubmitting}
+              >
+                {formik.isSubmitting ? "Logging in..." : "Login"}
+              </Button>
             </form>
-            {error.length > 0 && (
-                <ul className="text-red-500 bg-red-100 p-2 rounded-md mb-4">
-                    {error.map((err, index) => (
-                        <li key={index}>{err}</li>
-                    ))}
-                </ul>
+  
+            {generalError && (
+              <Alert variant="destructive" className="mt-4">
+                <AlertDescription>
+                  <p className="text-[#ED080B]">{generalError}</p>
+                </AlertDescription>
+              </Alert>
             )}
-
-            <div className="text-center mt-4">
-                <p>Didn't sign up yet?</p>
-                <a className="text-blue-500" href="/auth/signup">
-                    Sign Up
-                </a>
-            </div>
-            <div className="text-center mt-4">
+  
+            <div className="mt-6">
+              <Separator className="my-4" />
+              <p className="text-center text-sm text-gray-600 mt-2">Or continue with</p>
+              <div className="mt-4 flex justify-center">
                 <GoogleLoginButton />
+              </div>
             </div>
-        </div>
+          </CardContent>
+          <CardFooter>
+            <p className="text-sm text-center w-full text-gray-600">
+              Don't have an account?{" "}
+              <a href="/auth/signup" className="text-[#ED080B] hover:text-[#940507] hover:underline font-medium">
+                Sign Up
+              </a>
+            </p>
+          </CardFooter>
+        </Card>
+      </div>
     );
 };
 
